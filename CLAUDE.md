@@ -1,62 +1,77 @@
-﻿# signalflow Development Guidelines
+# signalflow Development Guidelines
 
-Auto-generated from MVP spec. Last updated: 2026-03-21
+Last updated: 2026-03-21
 
-## MVP (Phase 1) Technologies
+## Technologies
 
-- **Runtime**: Claude Code Skill (single command)
-- **Input**: Text snippets only (no URLs, no web fetching)
-- **Processing**: Claude's native reasoning (no external APIs or ML models)
-- **Output**: Markdown files (date-stamped)
+- **Runtime**: Claude Code Skill
+- **Discovery**: Parallel subagents via MCP tools (`web_search`, `fetch`)
+- **Processing**: Claude's native reasoning
+- **Output**: Markdown files (date-stamped, `digests/{YYYY}/{MM}/`)
 - **Storage**: File system only (local files)
-- **Testing**: Manual invocation + quality rubric validation
+- **Testing**: Manual invocation (snippets mode) + `/validate-digest`
 
-## Project Structure (MVP)
+## Project Structure
 
 ```text
-.claude/commands/
-  └── daily-digest.md          # Single skill (entire MVP implementation)
+.claude/
+  ├── commands/                        # Slash commands (/validate-digest, /speckit.*)
+  └── skills/
+      └── daily-digest/
+          ├── daily-digest.md          # Orchestrator skill
+          ├── agents/
+          │   ├── web-discovery-agent.md
+          │   ├── video-discovery-agent.md
+          │   └── social-discovery-agent.md
+          ├── scripts/
+          │   ├── check_runtime.py     # Preflight checks
+          │   ├── validate_input.py    # Input validation
+          │   ├── build_path.py        # Output path generation
+          │   └── write_digest.py      # File writing
+          └── resources/
+              ├── credibility-rules.md
+              ├── freshness-policy.md
+              ├── quality-rubric.md
+              └── digest-template.md
 
 digests/
-  └── {YYYY}/{MM}/             # Generated digest output
+  └── {YYYY}/{MM}/                     # Generated digest output
 
-specs/main/                     # Documentation
-  ├── spec.md                   # MVP requirements (source of truth)
-  ├── plan.md                   # Implementation plan
-  ├── research.md (Part A)      # MVP technical decisions
-  ├── benchmark.md              # Sample inputs + expected outputs
-  └── data-model.md             # MVP entities (simplified)
+specs/
+  └── daily-digest/        # Specification, contracts, benchmark
 ```
 
-## MVP Command
+## Skill
 
-```bash
-/daily-digest "<topic>" "[text snippet 1]" "[text snippet 2]" "[text snippet 3]"
-```
+| Skill | Location | Description |
+|-------|----------|-------------|
+| `daily-digest` | `.claude/skills/daily-digest/daily-digest.md` | Autonomous discovery via parallel agents. Snippets accepted for testing only. |
 
 ## Implementation Style
 
-- **Single skill** in `.claude/commands/daily-digest.md` (all logic in one prompt)
-- **No external code files** — everything in Claude Code
+- **Single skill** — all execution logic in `daily-digest.md`
+- **Agents as skills** — each discovery agent is a separate skill file under `agents/`
+- **Reference material** — rubrics, templates, policies live in `resources/`, not inline
+- **Python utility scripts** — I/O only (`scripts/`); no business logic
 - **No build cycle** — edit prompt, save, test immediately
-- **No dependencies** — no MCP, no subagents, no APIs in MVP
-- **Output**: Markdown files in `digests/{YYYY}/{MM}/`
 
-## Key Constraints (MVP)
+## Key Constraints
 
-- Text snippets only (user provides content directly)
+- Autonomous discovery by default; snippets mode for testing only
 - Exact counts: 1-3 insights, 2-4 anti-patterns, 1-3 actions, 3-5 resources
-- Quality rubric: novelty, evidence, specificity, actionability
-- All insights must cite evidence from provided content
-- No padding: output best available insights, don't force counts
+- Quality rubric: novelty, evidence, specificity, actionability (score 2 on ≥3 dimensions)
+- All insights must include a direct quote as evidence
+- No padding: output best available material, add quality warning if below minimum
+- Python stdlib only — no third-party packages
 
-## Future (Phase 2+)
+## Runtime Requirements
 
-- Phase 2: Autonomous discovery (MCP + subagents)
-- Phase 3: Feedback & learning
-- Phase 4+: Automation & scale
-
-See `specs/main/research.md` Part B for future design.
+| Dependency | Requirement |
+|---|---|
+| Python | ≥ 3.8, stdlib only |
+| `web_search` MCP | Must be active in Claude Code session |
+| `fetch` MCP | Must be active in Claude Code session |
+| `digests/` | Must be writable |
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

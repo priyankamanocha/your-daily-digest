@@ -19,12 +19,23 @@
       "Bash(find /c/Users/priya/dev/signalflow/specs -type f -name *.md)",
       "Bash(/tmp/final_summary.txt:*)",
       "Read(//tmp/**)",
-      "Bash(ls -lh /c/Users/priya/dev/signalflow/specs/001-autonomous-discovery/*.md)",
+      "Bash(ls -lh /c/Users/priya/dev/signalflow/specs/daily-digest/*.md)",
       "Bash(powershell -NoProfile -Command '.specify/scripts/powershell/check-prerequisites.ps1 -Json')",
       "Bash(powershell -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks 2>/dev/null\")",
       "Bash(powershell -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
       "Bash(mkdir -p .claude/skills)",
-      "Bash(rm .claude/commands/skills.md)"
+      "Bash(rm .claude/commands/skills.md)",
+      "Bash(mkdir -p .claude/skills/daily-digest)",
+      "Bash(mv .claude/commands/daily-digest.md .claude/skills/daily-digest/daily-digest.md)",
+      "Bash(mv .claude/skills/autonomous-discovery.md .claude/skills/autonomous-discovery/autonomous-discovery.md)",
+      "Bash(mkdir -p .claude/skills/daily-digest/scripts)",
+      "Bash(mv .claude/skills/autonomous-discovery/scripts/*.py .claude/skills/daily-digest/scripts/)",
+      "Bash(rm -rf .claude/skills/autonomous-discovery)",
+      "Bash(grep -rn 001-autonomous-discovery C:/Users/priya/dev/signalflow --include=*.md --include=*.json)",
+      "Bash(sed -i -e 's|\\\\.claude/commands/skills\\\\.md|.claude/skills/daily-digest/daily-digest.md|g' -e 's|\\\\.claude/skills/autonomous-discovery\\\\.md|.claude/skills/daily-digest/daily-digest.md|g' -e 's|skills\\\\.md|daily-digest.md|g' \"C:/Users/priya/dev/signalflow/specs/daily-digest/tasks.md\")",
+      "Bash(__NEW_LINE_14a01fc05f6349a9__ sed:*)",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/create-new-feature.ps1 -Json -ShortName 'skill-invocation-layer' 'invocation layer for the skill. add clear entrypoint and optional snippets into a single payload orchestrator and helper scripts both use'\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly\")"
     ]
   }
 }

@@ -1,11 +1,11 @@
-# /validate-digest: Automated MVP Validation
+# /validate-digest: Automated Validation
 
 ## Purpose
 
-Automatically validate `/daily-digest` skill output against MVP specifications:
-- `specs/000-mvp-manual-digest/benchmark.md` (expected outputs)
-- `specs/000-mvp-manual-digest/contracts/digest-output-schema.md` (output format)
-- `specs/000-mvp-manual-digest/data-model.md` (quality rubric)
+Automatically validate `/daily-digest` skill output against specifications:
+- `specs/daily-digest/benchmark.md` (expected outputs)
+- `specs/daily-digest/contracts/output-schema.md` (output format)
+- `specs/daily-digest/data-model.md` (quality rubric)
 
 Generate a structured validation report with pass/fail criteria.
 
@@ -16,10 +16,10 @@ Generate a structured validation report with pass/fail criteria.
 ### Step 1: Load Specification Files
 
 Read:
-- `specs/000-mvp-manual-digest/benchmark.md` (expected outputs for Sample Input Sets 1 & 2)
-- `specs/000-mvp-manual-digest/contracts/digest-output-schema.md` (output schema and validation rules)
-- `specs/000-mvp-manual-digest/data-model.md` (quality rubric: 4 dimensions, ≥3 score rule)
-- `.claude/commands/daily-digest.md` (skill implementation)
+- `specs/daily-digest/benchmark.md` (expected outputs for Sample Input Sets 1 & 2)
+- `specs/daily-digest/contracts/output-schema.md` (output schema and validation rules)
+- `specs/daily-digest/data-model.md` (quality rubric: 4 dimensions, ≥3 score rule)
+- `.claude/skills/daily-digest/daily-digest.md` (skill implementation)
 
 Stop if any file is missing.
 
@@ -175,14 +175,14 @@ Resources should reference:
 
 ### Step 8: Create Validation Report
 
-Generate `specs/000-mvp-manual-digest/automated-validation-report.md`:
+Generate `specs/daily-digest/automated-validation-report.md`:
 
 ```markdown
 # Automated Validation Report
 
 **Generated**: {current timestamp}
-**MVP Component**: `/daily-digest` skill
-**Specification Version**: 2026-03-21
+**Skill**: `/daily-digest`
+**Specification**: `specs/daily-digest/`
 **Validator**: /validate-digest
 
 ---
@@ -191,10 +191,10 @@ Generate `specs/000-mvp-manual-digest/automated-validation-report.md`:
 
 **Input**:
 - Topic: `claude-code`
-- Snippets: 3 from `specs/000-mvp-manual-digest/benchmark.md` Sample Input Set 1
+- Snippets: 3 from `specs/daily-digest/benchmark.md` Sample Input Set 1
 - Expected Signal: High-signal (no quality warning)
 
-**Output File**: `digests/2026/03/digest-2026-03-21-claude-code.md`
+**Output File**: `digests/{YYYY}/{MM}/digest-{YYYY-MM-DD}-claude-code.md`
 
 ### Automated Validation Results
 
@@ -223,10 +223,10 @@ Generate `specs/000-mvp-manual-digest/automated-validation-report.md`:
 
 **Input**:
 - Topic: `mcp-tools`
-- Snippets: 3 from `specs/000-mvp-manual-digest/benchmark.md` Sample Input Set 2
+- Snippets: 3 from `specs/daily-digest/benchmark.md` Sample Input Set 2
 - Expected Signal: High-signal (no quality warning)
 
-**Output File**: `digests/2026/03/digest-2026-03-21-mcp-tools.md`
+**Output File**: `digests/{YYYY}/{MM}/digest-{YYYY-MM-DD}-mcp-tools.md`
 
 ### Automated Validation Results
 
@@ -275,11 +275,9 @@ Generate `specs/000-mvp-manual-digest/automated-validation-report.md`:
 
 ## Rerun Instructions
 
-To validate again:
-
-1. Update `/daily-digest` logic if needed (fix in `.claude/commands/daily-digest.md`)
+1. Update skill logic if needed (fix in `.claude/skills/daily-digest/daily-digest.md`)
 2. Run: `/validate-digest`
-3. Check: `specs/000-mvp-manual-digest/automated-validation-report.md`
+3. Check: `specs/daily-digest/automated-validation-report.md`
 4. If FAIL on automated checks: Iterate on skill and rerun
 5. If PENDING: Complete manual review checklist
 
@@ -302,12 +300,12 @@ Output to user:
 Sample Input Set 1 (Subagents): PASS / FAIL
 Sample Input Set 2 (MCP Tools): PASS / FAIL
 
-Full Report: specs/000-mvp-manual-digest/automated-validation-report.md
+Full Report: specs/daily-digest/automated-validation-report.md
 
 Automated Checks: X/16 PASS
 Manual Review: PENDING / APPROVED / FAILED
 
-Next: [If PASS] MVP is validated. If FAIL, address issues in daily-digest.md and rerun.
+Next: [If PASS] Skill validated. If FAIL, address issues in daily-digest.md and rerun.
 ```
 
 ---
@@ -317,11 +315,11 @@ Next: [If PASS] MVP is validated. If FAIL, address issues in daily-digest.md and
 **If `/daily-digest` fails to run**:
 - Stop execution
 - Report error: "Cannot run /daily-digest. Check: topic format, snippet word counts, file permissions"
-- Suggest: "Verify .claude/commands/daily-digest.md is executable"
+- Suggest: "Verify .claude/skills/daily-digest/daily-digest.md is accessible"
 
 **If benchmark.md is missing**:
 - Stop execution
-- Report error: "Cannot load specs/000-mvp-manual-digest/benchmark.md. File missing."
+- Report error: "Cannot load specs/daily-digest/benchmark.md. File missing."
 
 **If output file path is wrong**:
 - Stop execution
@@ -343,4 +341,3 @@ Next: [If PASS] MVP is validated. If FAIL, address issues in daily-digest.md and
 - ✅ No scope changes (only validate, do not fix)
 - ✅ Timestamp every run
 - ✅ Clear PASS/FAIL/PENDING status
-

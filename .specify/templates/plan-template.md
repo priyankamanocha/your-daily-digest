@@ -31,7 +31,21 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify all gates from `.specify/memory/constitution.md` Governance → Constitution Check Gates table.
+
+| Gate | Principle | Status |
+|---|---|---|
+| Delivery vehicle: feature delivered as `.claude/skills/<name>/<name>.md` | I | ✅ / ❌ |
+| Skill format: frontmatter + User Input + Outline present | I + II | ✅ / ❌ |
+| Script scope: scripts perform I/O only, no business logic | II | ✅ / ❌ |
+| Reference material in `resources/`, not inline | II | ✅ / ❌ |
+| Evidence requirement: all insights include direct quote | III | ✅ / ❌ |
+| Count enforcement within 1–3/2–4/1–3/3–5 ranges | III | ✅ / ❌ |
+| Partial failure returns digest with status, not error | IV | ✅ / ❌ |
+| Preflight checks verify hard deps before discovery | IV | ✅ / ❌ |
+| Python stdlib only; no third-party packages | V | ✅ / ❌ |
+
+Document any ❌ violations in the Complexity Tracking table below with justification.
 
 ## Project Structure
 
