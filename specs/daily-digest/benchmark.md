@@ -1,8 +1,9 @@
-# SignalFlow MVP Benchmark
+# SignalFlow Benchmark
 
-**Purpose**: Sample inputs and expected-quality outputs for testing MVP digest quality consistently.
+**Purpose**: Sample inputs and expected-quality outputs for testing digest quality consistently.
 
-**How to use**: Run `/daily-digest claude-code "[snippet1]" "[snippet2]" "[snippet3]"` with the provided snippets, then evaluate the output against the expected quality levels.
+**How to use**: Run `/daily-digest claude-code "snippet1" "snippet2" "snippet3"` with the
+provided snippets, then evaluate the output against the expected quality levels.
 
 ---
 
@@ -34,14 +35,14 @@ Subagents are powerful but easy to misuse. I initially created one subagent per 
 per source type. Each subagent batches 10-20 items. That's the sweet spot for our use case.
 ```
 
-### Expected MVP Output Quality
+### Expected Output Quality
 
 **Insights Extracted** (should be 1-3 high-quality):
 1. ✅ **HIGH QUALITY** — "Parallel subagents reduce latency by 60% compared to sequential for multi-source retrieval"
    - Non-obvious? Yes (quantified performance claim)
    - Evidence? Multiple sources cite this pattern
    - Answers what/why/how? Yes
-   - Would qualify using rubric? Yes (scores 2 on novelty, evidence, specificity, actionability)
+   - Qualifies on rubric? Yes (scores 2 on novelty, evidence, specificity, actionability)
 
 2. ✅ **HIGH QUALITY** — "Subagent batching matters: 3-5 subagents per source type, 10-20 items per subagent, prevents overhead"
    - Non-obvious? Yes (specific tuning guidance)
@@ -50,9 +51,8 @@ per source type. Each subagent batches 10-20 items. That's the sweet spot for ou
    - Actionable? Yes, users can apply immediately
 
 3. ❌ **SHOULD BE REJECTED** — "Subagents are useful for parallel tasks"
-   - Why rejected? Generic/obvious statement; doesn't answer what/why/how; doesn't provide actionable guidance
-   - Would score 0-1 on novelty and actionability
-   - Better to output 2 strong insights than pad with this
+   - Why rejected? Generic/obvious statement; doesn't answer what/why/how; no actionable guidance
+   - Would score 0-1 on novelty and actionability — below rubric threshold
 
 **Anti-patterns** (should be 2-4):
 - ✅ "Creating one subagent per item (e.g., 50 items = 50 subagents) causes overhead; instead batch into 3-5 subagents"
@@ -92,7 +92,7 @@ But if you need a custom API, you either build an MCP for it or handle auth your
 The value of MCP is clear: fewer moving parts.
 ```
 
-### Expected MVP Output Quality
+### Expected Output Quality
 
 **Insights** (1-3):
 1. ✅ **HIGH QUALITY** — "MCP tools eliminate authentication complexity and dependency management by providing a single interface to external services"
@@ -116,8 +116,6 @@ The value of MCP is clear: fewer moving parts.
 
 ## Quality Rubric Application Guide
 
-Use this guide to evaluate MVP outputs:
-
 ### ✅ Insight PASSES If:
 - [x] Non-obvious (not something widely known in the field)
 - [x] Backed by evidence from provided content (direct quote or paraphrase with source attribution)
@@ -132,9 +130,9 @@ Use this guide to evaluate MVP outputs:
 
 ---
 
-## Testing MVP Digest Quality
+## Testing Digest Quality
 
-1. **Run with Sample Input Set 1** above
+1. **Run with Sample Input Set 1** above (snippets mode — no MCP tools needed)
 2. **Compare output**:
    - Are the high-quality insights listed?
    - Are low-quality insights rejected (not padded)?
@@ -144,15 +142,12 @@ Use this guide to evaluate MVP outputs:
    - Each insight: Novelty, Evidence, Specificity, Actionability (0-2 each)
    - Pass threshold: Score 2 on at least 3 of 4 dimensions
 4. **Repeat with Sample Input Set 2**
-5. **Iteration**: If output doesn't match expected quality, refine skill prompt and retry
-
----
 
 ## Benchmark Success Criteria
 
-MVP digest quality is validated when:
+Digest quality is validated when:
 - ✅ All high-quality insights in this benchmark are extracted
 - ✅ All low-quality items are rejected (not padded)
 - ✅ All anti-patterns are accurate
 - ✅ All actions are concrete and testable
-- ✅ Output matches the expected schema (1-3 insights, 2-4 anti-patterns, 1-3 actions, 3-5 resources)
+- ✅ Output matches expected schema (1-3 insights, 2-4 anti-patterns, 1-3 actions, 3-5 resources)
