@@ -7,7 +7,7 @@
 ## Command Format
 
 ```bash
-/daily-digest <topic> [--hints <hints>]
+/daily-digest <topic> [--hints <hints>] ["snippet1" "snippet2" ...]
 ```
 
 ---
@@ -42,6 +42,15 @@
   - `/daily-digest claude-code --hints Anthropic,@dmarx`
   - `/daily-digest agentic-workflows --hints @anthropic,@karpathy`
   - `/daily-digest subagents --hints Anthropic`
+
+### snippets (optional)
+- **Type**: list of quoted strings
+- **Description**: Raw content snippets for manual/test mode; when present, autonomous discovery is skipped entirely
+- **Constraints**: No length or count constraints
+- **Usage**: Test and development only — pass pre-collected content to exercise synthesis without running live discovery
+- **Examples**:
+  - `/daily-digest "AI agents" "Snippet one" "Snippet two"`
+- **Reference**: See `.claude/skills/daily-digest/resources/invocation-contract.md` for the full payload schema
 
 ---
 
@@ -79,7 +88,7 @@
 ```json
 {
   "topic": "claude-code",
-  "hints": null
+  "hints": []
 }
 ```
 
@@ -109,14 +118,13 @@
 
 ## Error Responses
 
-All validation errors return to user with:
-- Error message (human-readable)
-- Suggestion (how to fix)
-- Example of correct usage
+All validation errors return a single-line message:
+
+```
+Error: {error}
+```
 
 Example:
 ```
 Error: topic exceeds 100 characters
-Suggestion: Keep topic under 100 characters
-Example: /daily-digest claude-code
 ```

@@ -79,10 +79,7 @@ Discovery: {status}
 
 **Output Message** (displayed to user, no file created):
 ```
-No relevant content discovered for topic '{topic}'.
-
-Try providing hints to guide discovery:
-/daily-digest {topic} --hints [youtube_channels or @twitter_users]
+No relevant content discovered for '{topic}'.
 
 Try providing content manually (test mode):
 /daily-digest "{topic}" "[snippet1]" "[snippet2]"
