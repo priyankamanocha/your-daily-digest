@@ -11,7 +11,7 @@
 
 **Input**:
 - Topic: `claude-code`
-- Snippets: 3 from `specs/main/benchmark.md` Sample Input Set 1
+- Snippets: 3 from `specs/000-mvp-manual-digest/benchmark.md` Sample Input Set 1
 - Expected Signal: High-signal (no quality warning)
 
 **Output File**: `digests/2026/03/digest-2026-03-21-claude-code.md`
@@ -56,7 +56,7 @@
 
 **Input**:
 - Topic: `mcp-tools`
-- Snippets: 3 from `specs/main/benchmark.md` Sample Input Set 2
+- Snippets: 3 from `specs/000-mvp-manual-digest/benchmark.md` Sample Input Set 2
 - Expected Signal: High-signal (no quality warning)
 
 **Output File**: `digests/2026/03/digest-2026-03-21-mcp-tools.md`
@@ -144,7 +144,7 @@ To validate again:
 
 1. Update `/daily-digest` logic if needed (edit `.claude/commands/daily-digest.md`)
 2. Run: `/validate-digest`
-3. Check: `specs/main/automated-validation-report.md`
+3. Check: `specs/000-mvp-manual-digest/automated-validation-report.md`
 4. If FAIL on automated checks: Fix skill and rerun
 5. If PENDING: Complete manual review checklist above
 
@@ -158,3 +158,4 @@ To validate again:
 - This report is generated automatically; updates with each run
 - Do not modify this file manually (it is overwritten by /validate-digest)
 - This report validates **well-formedness** and **presence of expected patterns**, not **quality** or **semantic accuracy**
+

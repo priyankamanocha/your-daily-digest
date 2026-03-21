@@ -1,7 +1,7 @@
 # Implementation Plan: SignalFlow Daily Intelligence Digest
 
-**Branch**: `main` | **Date**: 2026-03-21 | **Spec**: `/specs/main/spec.md`
-**Input**: Feature specification from `/specs/main/spec.md`
+**Branch**: `main` | **Date**: 2026-03-21 | **Spec**: `/specs/000-mvp-manual-digest/spec.md`
+**Input**: Feature specification from `/specs/000-mvp-manual-digest/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
 
@@ -46,7 +46,7 @@ SignalFlow is a Claude Code skill/command system that generates high-quality dig
 ### Documentation (this feature)
 
 ```text
-specs/main/
+specs/000-mvp-manual-digest/
 ├── spec.md                      # Feature requirements (completed)
 ├── plan.md                      # This file (implementation plan, completed)
 ├── research.md                  # Phase 0: Technical decisions (completed)
@@ -85,7 +85,7 @@ SignalFlow MVP is implemented as a **single Claude Code skill** (minimal scope):
 - `/daily-digest <topic> "[text snippet 1]" "[text snippet 2]" "[text snippet 3]"` — text snippets only, no URLs, no web fetching
 - Skill defined as `.md` file in `.claude/commands/daily-digest.md` with step-by-step prompts
 - Generated digests archived in `digests/` by date
-- Feature spec colocated in `specs/main/`
+- Feature spec colocated in `specs/000-mvp-manual-digest/`
 - **No data directory**: MVP has no persistent state; all input is ephemeral
 
 **Rationale**:
@@ -112,3 +112,4 @@ SignalFlow MVP is implemented as a **single Claude Code skill** (minimal scope):
 | Scheduled execution (cron) | Not needed for manual invocation MVP | User-triggered `/daily-digest` command |
 | Real-time updates (WebSockets, SSE) | Not needed for daily batch digest | Polling/batch mode sufficient |
 | Feedback capture & learning | Deferred to Phase 3+ | Manual digest generation only |
+

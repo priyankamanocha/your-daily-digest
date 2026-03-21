@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \".specify/scripts/powershell/update-agent-context.ps1 -AgentType claude\" 2>&1)",
+      "Bash(cd:*)",
+      "Bash(gh repo:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(powershell -Command \".\\\\.specify\\\\scripts\\\\powershell\\\\check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\" 2>&1 | head -100)",
+      "Bash(pwsh -Command \"./.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\" 2>&1)",
+      "Bash(powershell -Command \".\\\\.specify\\\\scripts\\\\powershell\\\\check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
+      "Bash(powershell -Command \".\\\\.specify\\\\scripts\\\\powershell\\\\create-new-feature.ps1 -Description ''''Phase 2: Autonomous Discovery - Extend SignalFlow to autonomously discover relevant content from web search, YouTube, and Twitter APIs using MCP integrations and subagents for parallel retrieval and semantic deduplication. Removes manual content curation requirement while maintaining MVP quality standards. Target timeline: 2-3 weeks after MVP validation.'''' -Json -ShortName ''''autonomous-discovery'''' ''''Autonomous Content Discovery''''\")",
+      "Bash(powershell -Command \".\\\\.specify\\\\scripts\\\\powershell\\\\setup-plan.ps1 -Json\")",
+      "Bash(xargs grep:*)",
+      "Bash(find /c/Users/priya/dev/signalflow/specs -type f -name *.md)",
+      "Bash(/tmp/final_summary.txt:*)",
+      "Read(//tmp/**)",
+      "Bash(ls -lh /c/Users/priya/dev/signalflow/specs/001-autonomous-discovery/*.md)",
+      "Bash(powershell -NoProfile -Command '.specify/scripts/powershell/check-prerequisites.ps1 -Json')",
+      "Bash(powershell -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks 2>/dev/null\")",
+      "Bash(powershell -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
+      "Bash(mkdir -p .claude/skills)",
+      "Bash(rm .claude/commands/skills.md)"
+    ]
+  }
+}

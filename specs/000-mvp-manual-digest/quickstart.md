@@ -68,7 +68,7 @@ signalflow/
 ├── digests/                          # Generated output (created by skill)
 │   └── {YYYY}/{MM}/
 │       └── digest-{date}-{topic}.md
-└── specs/main/                       # Documentation
+└── specs/000-mvp-manual-digest/                       # Documentation
     ├── spec.md                       # MVP requirements (source of truth)
     ├── plan.md                       # Implementation plan
     ├── research.md                   # Technical decisions
@@ -133,11 +133,11 @@ Evaluate each candidate insight on 4 dimensions:
 ### MVP Files to Edit
 
 - `.claude/commands/daily-digest.md` — The skill implementation (all logic lives here)
-- `specs/main/spec.md` — Source of truth for MVP requirements
-- `specs/main/research.md` (Part A only) — MVP technical decisions
+- `specs/000-mvp-manual-digest/spec.md` — Source of truth for MVP requirements
+- `specs/000-mvp-manual-digest/research.md` (Part A only) — MVP technical decisions
 
 **Do NOT edit during implementation**:
-- `specs/main/contracts/feedback-input-schema.md` (Phase 3 only)
+- `specs/000-mvp-manual-digest/contracts/feedback-input-schema.md` (Phase 3 only)
 - Any Phase 2+ content in `research.md` Part B
 - Post-MVP features in `plan.md`
 
@@ -184,3 +184,4 @@ Use this to validate MVP implementation.
 - **Output format**: See `contracts/digest-output-schema.md`
 
 **All docs describe MVP only. Phase 2+ content is clearly marked as future.**
+

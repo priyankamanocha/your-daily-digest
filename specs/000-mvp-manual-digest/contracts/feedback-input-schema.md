@@ -77,4 +77,5 @@ Used to prioritize sources in Phase 2+ autonomous discovery.
 
 This contract is documented here for future reference only.
 
-See `specs/main/research.md` Part B for the complete Phase 3 design.
+See `specs/000-mvp-manual-digest/research.md` Part B for the complete Phase 3 design.
+

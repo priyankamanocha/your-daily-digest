@@ -4,7 +4,7 @@ description: "Task list for SignalFlow Daily Intelligence Digest MVP implementat
 
 # Tasks: SignalFlow Daily Intelligence Digest
 
-**Input**: Design documents from `/specs/main/`
+**Input**: Design documents from `/specs/000-mvp-manual-digest/`
 **Branch**: `main`
 **MVP Scope**: User Stories 1 & 2 (P1) - Core digest generation and insight extraction
 **Phase 2+**: Autonomous discovery, learning, and persistence (post-MVP)
@@ -47,7 +47,7 @@ description: "Task list for SignalFlow Daily Intelligence Digest MVP implementat
 
 **Goal**: Implement the `/daily-digest <topic> "[text snippet 1]" "[text snippet 2]" "[text snippet 3]"` command that accepts user-provided text snippets and produces a date-stamped markdown digest.
 
-**Independent Test**: Run `/daily-digest claude-code "[snippet1]" "[snippet2]" "[snippet3]"` with sample content from `specs/main/benchmark.md`, verify output file is created at `digests/{YYYY}/{MM}/digest-{YYYY-MM-DD}-claude-code.md` with correct structure (sections present, no errors).
+**Independent Test**: Run `/daily-digest claude-code "[snippet1]" "[snippet2]" "[snippet3]"` with sample content from `specs/000-mvp-manual-digest/benchmark.md`, verify output file is created at `digests/{YYYY}/{MM}/digest-{YYYY-MM-DD}-claude-code.md` with correct structure (sections present, no errors).
 
 ### Implementation for User Story 1
 
@@ -55,7 +55,7 @@ description: "Task list for SignalFlow Daily Intelligence Digest MVP implementat
 - [x] T007 [US1] Implement output file path generation: Build `digests/{YYYY}/{MM}/digest-{YYYY-MM-DD}-{topic-slug}.md` path with current date and topic slugification
 - [x] T008 [US1] Implement markdown file writer: Generate and save digest file to computed path with generated content (depends on T011-T015 for full content generation)
 - [x] T009 [US1] Add error handling: Handle missing arguments, invalid topic names, file system errors with clear error messages
-- [x] T010 [US1] Test with benchmark inputs: Run skill with Sample Input Set 1 (Subagents) from `specs/main/benchmark.md`, verify file creation and basic structure
+- [x] T010 [US1] Test with benchmark inputs: Run skill with Sample Input Set 1 (Subagents) from `specs/000-mvp-manual-digest/benchmark.md`, verify file creation and basic structure
 
 **Checkpoint**: User Story 1 complete - `/daily-digest` command works end-to-end with file output
 
@@ -65,7 +65,7 @@ description: "Task list for SignalFlow Daily Intelligence Digest MVP implementat
 
 **Goal**: Implement the core insight extraction and synthesis engine that evaluates provided content against the quality rubric and produces 1-3 high-quality insights, 2-4 anti-patterns, 1-3 actions, and 3-5 resources (or best-available with quality warning if low-signal).
 
-**Independent Test**: Provide Sample Input Sets 1 & 2 from `specs/main/benchmark.md` to the skill, verify output insights match expected quality levels (high-quality insights extracted, low-quality items rejected, no padding), anti-patterns are accurate, actions are concrete and testable, and count targets are met for high-signal content (or quality warning present for low-signal).
+**Independent Test**: Provide Sample Input Sets 1 & 2 from `specs/000-mvp-manual-digest/benchmark.md` to the skill, verify output insights match expected quality levels (high-quality insights extracted, low-quality items rejected, no padding), anti-patterns are accurate, actions are concrete and testable, and count targets are met for high-signal content (or quality warning present for low-signal).
 
 ### Implementation for User Story 2
 
@@ -75,8 +75,8 @@ description: "Task list for SignalFlow Daily Intelligence Digest MVP implementat
 - [x] T014 [US2] Implement resource selection: Extract 3-5 supporting references with "why it matters" justification from provided content in `.claude/commands/daily-digest.md` (depends on T011)
 - [x] T015 [US2] Implement low-signal handling: If fewer than target counts achieved, output best-available content and include quality warning (`⚠️ Low-signal content — insights below represent the best available material`) without padding (depends on T011-T014)
 - [x] T016 [US2] Implement evidence citation: Ensure all insights include direct quotes, all anti-patterns cite sources, all resources reference provided content (depends on T011-T015)
-- [x] T017 [US2] Test with benchmark Sample Input Set 1 (Subagents): Verify high-quality insights extracted (latency reduction claim, batching guidance), low-quality generic statements rejected using `specs/main/benchmark.md`
-- [x] T018 [US2] Test with benchmark Sample Input Set 2 (MCP Tools): Verify insights about authentication elimination and tool availability, anti-patterns about dependency management and tool availability assumptions are accurately extracted using `specs/main/benchmark.md`
+- [x] T017 [US2] Test with benchmark Sample Input Set 1 (Subagents): Verify high-quality insights extracted (latency reduction claim, batching guidance), low-quality generic statements rejected using `specs/000-mvp-manual-digest/benchmark.md`
+- [x] T018 [US2] Test with benchmark Sample Input Set 2 (MCP Tools): Verify insights about authentication elimination and tool availability, anti-patterns about dependency management and tool availability assumptions are accurately extracted using `specs/000-mvp-manual-digest/benchmark.md`
 - [x] T019 [US2] Validate quality rubric consistency: Ensure all extracted insights score ≥2 on at least 3 of 4 dimensions per data-model.md rules
 
 **Checkpoint**: User Stories 1 & 2 complete - MVP digest generation is fully functional with high-quality insight extraction
@@ -88,8 +88,8 @@ description: "Task list for SignalFlow Daily Intelligence Digest MVP implementat
 **Purpose**: Improvements that affect multiple user stories or the overall system
 
 - [x] T020 Update `.claude/commands/daily-digest.md` with complete inline documentation and usage examples
-- [x] T021 Run quickstart.md validation: Follow developer and user guides in `specs/main/quickstart.md` end-to-end to verify all documented workflows function correctly
-- [x] T022 Final output validation: Run digest generation against all benchmark samples and verify output format matches `specs/main/contracts/digest-output-schema.md` exactly (1-3 insights, 2-4 anti-patterns, 1-3 actions, 3-5 resources for high-signal; best-available with quality warning for low-signal)
+- [x] T021 Run quickstart.md validation: Follow developer and user guides in `specs/000-mvp-manual-digest/quickstart.md` end-to-end to verify all documented workflows function correctly
+- [x] T022 Final output validation: Run digest generation against all benchmark samples and verify output format matches `specs/000-mvp-manual-digest/contracts/digest-output-schema.md` exactly (1-3 insights, 2-4 anti-patterns, 1-3 actions, 3-5 resources for high-signal; best-available with quality warning for low-signal)
 
 **Checkpoint**: MVP is complete, documented, and ready for delivery
 
@@ -192,3 +192,4 @@ After MVP validation:
 - Benchmark-driven: Validate against exact sample inputs and expected outputs
 - Independent testing: Each user story can be validated in isolation
 - Fast iteration: Modify prompt → test in <5 min → iterate
+
