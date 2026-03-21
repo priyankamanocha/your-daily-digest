@@ -3,7 +3,9 @@
 Build the output file path for a digest.
 
 Usage:
-    python build_path.py <topic>
+    python build_path.py <payload_json>
+
+    Where <payload_json> is a JSON string: {"topic": "...", "hints": [...], "snippets": [...]}
 
 Output:
     digests/YYYY/MM/digest-YYYY-MM-DD-<topic-slug>.md
@@ -11,6 +13,7 @@ Output:
 
 import sys
 import re
+import json
 from datetime import datetime
 
 
@@ -21,5 +24,10 @@ def build_path(topic: str) -> str:
 
 
 if __name__ == "__main__":
-    topic = sys.argv[1] if len(sys.argv) > 1 else "untitled"
+    raw = sys.argv[1] if len(sys.argv) > 1 else "{}"
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError:
+        payload = {}
+    topic = payload.get("topic", "untitled")
     print(build_path(topic))

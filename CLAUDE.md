@@ -1,4 +1,4 @@
-# signalflow Development Guidelines
+﻿# signalflow Development Guidelines
 
 Last updated: 2026-03-21
 

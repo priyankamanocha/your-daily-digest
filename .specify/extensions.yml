@@ -1,0 +1,21 @@
+# SignalFlow speckit extension hooks
+# Runs slash commands automatically at key points in the speckit workflow.
+
+hooks:
+
+  # After /speckit.implement completes: verify spec-implementation alignment.
+  # This ensures any code changes haven't drifted from the spec.
+  after_implement:
+    - extension: "Spec Alignment Review"
+      command: "review-spec"
+      description: "Check that the daily-digest implementation matches its specification across all 5 dimensions (input contract, output contract, data model, architecture, functional requirements). Writes a gap report to specs/daily-digest/spec-review-report.md."
+      optional: true
+      enabled: true
+
+  # After /speckit.tasks completes: cross-check task quality and consistency.
+  after_tasks:
+    - extension: "Task Consistency Check"
+      command: "speckit.analyze"
+      description: "Validate that generated tasks are consistent with spec.md, plan.md, and data-model.md. Flags missing coverage or contradictions before implementation starts."
+      optional: true
+      enabled: true
