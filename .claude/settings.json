@@ -4,7 +4,8 @@
       "Bash(python .claude/skills/daily-digest/scripts/check_runtime.py)",
       "Bash(python .claude/skills/daily-digest/scripts/validate_input.py *)",
       "Bash(python .claude/skills/daily-digest/scripts/build_path.py *)",
-      "Bash(python .claude/skills/daily-digest/scripts/write_digest.py *)"
+      "Bash(python .claude/skills/daily-digest/scripts/write_digest.py *)",
+      "Bash(python .claude/skills/daily-digest/scripts/write_manifest.py *)"
     ]
   }
 }
