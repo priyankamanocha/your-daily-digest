@@ -36,6 +36,11 @@ coverage/
 Thumbs.db
 *.tmp
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
 # Project-specific
 digests/
 .claude/commands/*.tmp
