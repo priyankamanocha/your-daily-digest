@@ -54,11 +54,11 @@ python .claude/skills/daily-digest/scripts/check_runtime.py
 
 If exit code is non-zero, stop and report each failed check from the JSON output.
 
-Also verify MCP tools are available before proceeding:
-- `web_search` — required by all three discovery agents
-- `fetch` — required by all three discovery agents
+Also verify Claude Code's built-in tools are available before proceeding:
+- `WebSearch` — required by all three discovery agents
+- `WebFetch` — required by all three discovery agents
 
-If either MCP tool is unavailable, warn the user and stop. Autonomous discovery cannot run without them. Suggest using manual/test mode with snippets instead.
+These are built into Claude Code and require no MCP configuration. If either is unavailable in the current session, warn the user and suggest using manual/test mode with snippets instead.
 
 ---
 

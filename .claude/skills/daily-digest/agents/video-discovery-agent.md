@@ -26,11 +26,11 @@ If hint channels were provided, prefix queries with `site:youtube.com/{channel}`
 
 ### 2. Search YouTube
 
-Run each query with `web_search`. Collect the top 3 video results per query (up to 10 URLs total).
+Run each query with `WebSearch`. Collect the top 3 video results per query (up to 10 URLs total).
 
 ### 3. Fetch and Extract
 
-For each video URL, use `fetch` to retrieve the page. Extract:
+For each video URL, use `WebFetch` to retrieve the page. Extract:
 - **title** — video title
 - **url** — YouTube URL
 - **channel** — channel name

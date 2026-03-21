@@ -26,11 +26,11 @@ Generate 3–5 search queries that cover different angles:
 
 ### 2. Search the Web
 
-Run each query with `web_search`. Collect the top 3 results per query (up to 15 URLs total). If hint domains were provided, bias queries toward those sources.
+Run each query with `WebSearch`. Collect the top 3 results per query (up to 15 URLs total). If hint domains were provided, bias queries toward those sources.
 
 ### 3. Fetch and Extract
 
-For each URL, use `fetch` to retrieve the page. Extract:
+For each URL, use `WebFetch` to retrieve the page. Extract:
 - **title** — page or article title
 - **url** — canonical URL
 - **author** — byline or publisher name
