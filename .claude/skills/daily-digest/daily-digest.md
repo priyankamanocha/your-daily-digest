@@ -82,7 +82,7 @@ If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snip
 
 ### 3. Choose Mode
 
-- `payload.snippets` non-empty → skip to Step 8 (manual/test mode)
+- `payload.snippets` non-empty → **Snippets mode**: build synthetic source records for each snippet (see Step 4 snippets section), set `manifest_discovery_status = "manual"`, `manifest_agents_succeeded = []`, `manifest_agents_failed = []`, then skip to Step 8
 - `payload.snippets` empty → run Steps 4–7 (autonomous discovery)
 
 ---
@@ -97,6 +97,19 @@ Start all three simultaneously — do not wait for one before launching the next
 
 Proceed with whatever results are available after 45 seconds.
 
+**Manifest data — autonomous mode**: For each `SOURCE:` line returned by an agent, parse the pipe-separated fields and build a source record per the schema in `.claude/skills/daily-digest/resources/manifest-schema.md`. Set `source_type` and `agent` from the originating agent (`web`, `video`, or `social`). Leave `credibility_score`, `credibility_signal`, and `freshness_score` as `null` — they are filled in Step 6. Accumulate all records as `manifest_sources`.
+
+**Manifest data — snippets mode**: For each snippet in `payload.snippets`, build a synthetic source record:
+```json
+{
+  "url": null, "title": "Snippet {n}", "source_type": "snippet", "agent": "manual",
+  "author_or_handle": null, "date": null, "days_old": 0,
+  "credibility_score": null, "credibility_signal": null, "freshness_score": null,
+  "summary": "<snippet text>"
+}
+```
+Accumulate as `manifest_sources`. Set `manifest_dedup_groups = []`.
+
 ---
 
 ### 5. Assess Discovery Status
@@ -110,11 +123,15 @@ Merge all sources and record:
 | 0 | go to step 10 |
 | Timeout | `timeout — partial results used` |
 
+**Manifest data**: Store `manifest_discovery_status` (the status string above), `manifest_agents_succeeded` (list of agent names that returned results), and `manifest_agents_failed` (list of agent names that failed or timed out).
+
 ---
 
 ### 6. Score Source Credibility
 
 Apply scoring rules from `.claude/skills/daily-digest/resources/credibility-rules.md`.
+
+**Manifest data**: For each record in `manifest_sources`, set `credibility_score` (0–3) and `credibility_signal` (the observable trust indicator used). Also apply freshness scoring per `.claude/skills/daily-digest/resources/freshness-policy.md` and set `freshness_score` (0–3, or `null` if date unavailable).
 
 ---
 
@@ -130,6 +147,10 @@ From credible sources only (score ≥ 2), extract 10–20 candidates. For each:
 
 Then deduplicate: group semantically equivalent candidates, keep the one with the strongest evidence from the most credible source. When credibility scores are equal, prefer the fresher source.
 
+**Manifest data — deduplication groups**: For each semantic group of ≥2 equivalent candidates that were merged, record a deduplication group entry per the schema in `manifest-schema.md` (fields: `group_id`, `candidate_urls`, `winner_url`, `reason`). Accumulate as `manifest_dedup_groups`. If no merges occurred, `manifest_dedup_groups = []`.
+
+**Manifest data — candidates**: For each deduplicated candidate, score it on the four quality rubric dimensions (novelty, evidence, specificity, actionability — each 0–2) and compute `quality_pass` (true if score is 2 on ≥3 dimensions). Record a candidate entry per the schema in `manifest-schema.md`. Accumulate as `manifest_candidates`.
+
 ---
 
 ### 8. Apply Quality Rubric and Select Final Content
@@ -143,6 +164,8 @@ Select final content:
 - **Resources**: 3–5 (credible sources first, supplementary sources after)
 
 If any section falls below its minimum, add the quality warning.
+
+**Manifest data**: As each section's content is finalised, record a `SelectionItem` (`title`, `primary_source_url`) for each selected item. Accumulate as `manifest_section_selections` with keys `key_insights`, `antipatterns`, `actions`, `resources`. Set `manifest_quality_warning = true` if the quality warning was triggered, otherwise `false`.
 
 ---
 
@@ -160,7 +183,33 @@ python .claude/skills/daily-digest/scripts/write_digest.py "$FILE_PATH" "$CONTEN
 
 **Digest format**: see `.claude/skills/daily-digest/resources/digest-template.md`
 
-Return: `✅ Digest created: {file_path}`
+**Write manifest**: After writing the digest, assemble the manifest payload from all accumulated manifest data:
+
+```json
+{
+  "schema_version": "1.0",
+  "topic": "<payload.topic>",
+  "generated_at": "<timestamp matching digest Generated: line>",
+  "discovery_status": "<manifest_discovery_status>",
+  "agents_succeeded": "<manifest_agents_succeeded>",
+  "agents_failed": "<manifest_agents_failed>",
+  "quality_warning": "<manifest_quality_warning>",
+  "sources": "<manifest_sources>",
+  "deduplication_groups": "<manifest_dedup_groups>",
+  "candidates": "<manifest_candidates>",
+  "section_selections": "<manifest_section_selections>"
+}
+```
+
+Serialise to compact JSON, then call:
+
+```bash
+python .claude/skills/daily-digest/scripts/write_manifest.py "$FILE_PATH" "$MANIFEST_JSON"
+```
+
+The schema for all manifest records is in `.claude/skills/daily-digest/resources/manifest-schema.md`.
+
+Return: `Digest created: {file_path}` and `Manifest created: {manifest_path}`
 
 ---
 
@@ -175,4 +224,4 @@ Try providing content manually (test mode):
 /daily-digest "{payload.topic}" "[snippet 1]" "[snippet 2]"
 ```
 
-Do not write a file.
+Do not write a file. Do not call `write_manifest.py` — no manifest is written in the fallback case.
