@@ -1,11 +1,21 @@
 # Specs
 
-## Active
+Feature specifications, implementation plans, and design artifacts.
 
-- `daily-digest/` — Current specification.
-  Autonomous content discovery via parallel agents (web, video, social).
-  Includes: spec, plan, data model, contracts, benchmark, tasks.
+## Features
 
-## Usage
+| # | Feature | Status | Artifacts |
+|---|---------|--------|-----------|
+| — | `daily-digest/` | Shipped | spec, plan, data-model, contracts, benchmark, tasks |
+| 002 | `002-skill-invocation-layer/` | In progress | spec, plan, data-model, contracts, tasks |
+| 004 | `004-post-write-validator/` | Planning | spec, plan, research, data-model, contracts, quickstart |
 
-All feature planning, validation, and benchmarking uses `daily-digest/`.
+## Workflow
+
+```
+/speckit.specify   → create spec
+/speckit.clarify   → resolve ambiguities
+/speckit.plan      → generate research, data model, contracts
+/speckit.tasks     → generate task breakdown
+/speckit.implement → execute tasks
+```

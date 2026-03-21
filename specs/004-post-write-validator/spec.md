@@ -89,10 +89,10 @@ When a section meets minimum count but the content is flagged as low-signal (per
 - **FR-003**: The validator MUST count items in each section and report any that fall outside the allowed range: Insights 1–3, Anti-patterns 2–4, Actions 1–3, Resources 3–5.
 - **FR-004**: The validator MUST verify that every item in the Key Insights section includes an `**Evidence**:` field containing a value wrapped in double quotes.
 - **FR-005**: The validator MUST detect unclosed fenced code blocks and report them with an approximate line reference.
-- **FR-006**: The validator MUST check for the presence of the `⚠️ Low-signal content` footer when the `Discovery:` line indicates partial or timeout results.
-- **FR-007**: The validator MUST produce a structured summary listing: pass/fail status per check, count of failures, and specific failure details (section name, line reference, or item title as applicable).
-- **FR-008**: The validator MUST exit with a non-zero status code when any check fails, and exit with zero when all checks pass.
-- **FR-009**: The validator MUST be invokable as a standalone script using only Python standard library.
+- **FR-006**: The validator MUST check for the presence of the `⚠️ Low-signal content` footer when and only when the `Discovery:` metadata line contains the keyword `partial` or `timeout`. Item counts at minimum do not independently trigger this check.
+- **FR-007**: The validator MUST produce a structured summary listing: pass/fail status per check, count of failures, and specific failure details (section name, line reference, or item title as applicable). This report MUST be printed to stdout AND written to a file named `<digest-filename>.validation.txt` in the same directory as the digest.
+- **FR-008**: The validator MUST exit with code 1 when any check fails and code 0 when all checks pass. No category-specific exit codes are used; failure detail is communicated through the report only. A non-zero exit MUST cause the calling orchestrator to treat the digest generation run as failed.
+- **FR-009**: The validator MUST be invokable as a standalone script using only Python standard library, accepting any valid digest file path — not only digests written in the current session.
 - **FR-010**: The validator MUST handle missing files, empty files, and permission errors gracefully, reporting a clear error and exiting with a non-zero status.
 
 ### Key Entities
@@ -113,10 +113,20 @@ When a section meets minimum count but the content is flagged as low-signal (per
 - **SC-004**: The validator never exits with status zero when a required check has failed — false pass rate is 0%.
 - **SC-005**: A developer unfamiliar with the digest format can interpret the validation report and understand what failed and where without consulting documentation.
 
+## Clarifications
+
+### Session 2026-03-21
+
+- Q: Where does the validation report go (stdout, file alongside digest, or both)? → A: Both — printed to stdout AND written as `<digest-filename>.validation.txt` in the same directory as the digest.
+- Q: Is validation failure blocking (aborts orchestrator) or advisory (warns but continues)? → A: Blocking — the orchestrator treats a non-zero exit as a hard stop; the digest generation run fails.
+- Q: Can the validator run standalone on any existing digest, or only as a post-write orchestrator step? → A: Standalone — accepts any valid digest file path and works independently of the write step.
+- Q: Should the exit code distinguish between failure categories or use a single non-zero code? → A: Single non-zero (exit 1) for any failure; per-check details are communicated through the report only.
+- Q: What triggers the low-signal footer check — Discovery line only, count-at-minimum, or both? → A: Discovery line only — check fires only when the `Discovery:` field contains `partial` or `timeout`.
+
 ## Assumptions
 
 - The validator runs after `write_digest.py` has completed successfully; it does not perform the write itself.
 - The digest template's section headings use the exact strings defined in `digest-template.md` (`## Key Insights (1–3)`, `## Anti-patterns (2–4)`, `## Actions to Try (1–3)`, `## Resources (3–5)`). The validator matches against these exact strings.
 - "Low-signal" detection is triggered by the `Discovery:` metadata line containing the keywords `partial` or `timeout`, consistent with the template's field rules.
 - Item counting logic uses the structural marker for each section type: `###` sub-headings for Insights and Actions, leading `- **` list items for Anti-patterns and Resources.
-- The validator is invoked by the daily-digest orchestrator skill after each successful write; it is not a background or scheduled job.
+- The validator is invoked by the daily-digest orchestrator skill after each successful write, and is also directly invokable via `/validate-digest` against any previously written digest file.
