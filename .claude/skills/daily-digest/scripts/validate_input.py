@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Validate topic and hints for autonomous discovery.
+Validate the canonical invocation payload for the daily-digest skill.
 
 Usage:
-    python validate_input.py <topic> [hints]
+    python validate_input.py <payload_json>
+
+    Where <payload_json> is a JSON string: {"topic": "...", "hints": [...], "snippets": [...]}
 
 Exit codes:
-    0 = valid
-    1 = invalid (error printed to stdout)
+    0 = valid; prints {"valid": true, "topic": ..., "hints": ..., "snippets": ...}
+    1 = invalid; prints {"valid": false, "error": "..."}
+
+See .claude/skills/daily-digest/resources/invocation-contract.md for field constraints.
 """
 
 import sys
@@ -20,32 +24,41 @@ HINTS_MAX_COUNT = 10
 HINTS_MAX_LEN = 50
 
 
-def validate(topic: str, hints_str: str = "") -> dict:
+def validate(payload: dict) -> dict:
+    topic = payload.get("topic", "")
+    hints = payload.get("hints", [])
+    snippets = payload.get("snippets", [])
+
     # Topic
-    if not topic or not topic.strip():
+    if not topic:
         return {"valid": False, "error": "topic is required"}
+    if not topic.strip():
+        return {"valid": False, "error": "topic cannot be empty"}
     topic = topic.strip()
     if len(topic) > TOPIC_MAX_LEN:
         return {"valid": False, "error": f"topic exceeds {TOPIC_MAX_LEN} characters"}
     if not TOPIC_PATTERN.match(topic):
-        return {"valid": False, "error": "topic contains invalid characters (use alphanumeric, hyphens, underscores)"}
+        return {"valid": False, "error": "topic contains invalid characters (use alphanumeric, hyphens, underscores, spaces)"}
 
     # Hints
-    hints = []
-    if hints_str:
-        hints = list(dict.fromkeys(h.strip() for h in hints_str.split(",") if h.strip()))
-        if len(hints) > HINTS_MAX_COUNT:
-            return {"valid": False, "error": f"hints exceeds {HINTS_MAX_COUNT} items"}
-        for h in hints:
-            if len(h) > HINTS_MAX_LEN:
-                return {"valid": False, "error": f'hint "{h[:20]}..." exceeds {HINTS_MAX_LEN} characters'}
+    if len(hints) > HINTS_MAX_COUNT:
+        return {"valid": False, "error": f"hints exceeds {HINTS_MAX_COUNT} items"}
+    for h in hints:
+        if len(h) > HINTS_MAX_LEN:
+            return {"valid": False, "error": f'hint "{h[:20]}..." exceeds {HINTS_MAX_LEN} characters'}
 
-    return {"valid": True, "topic": topic, "hints": hints}
+    # Snippets pass through without validation
+    return {"valid": True, "topic": topic, "hints": hints, "snippets": snippets}
 
 
 if __name__ == "__main__":
-    topic = sys.argv[1] if len(sys.argv) > 1 else ""
-    hints = sys.argv[2] if len(sys.argv) > 2 else ""
-    result = validate(topic, hints)
+    raw = sys.argv[1] if len(sys.argv) > 1 else ""
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError:
+        print(json.dumps({"valid": False, "error": "invalid payload format"}))
+        sys.exit(1)
+
+    result = validate(payload)
     print(json.dumps(result))
     sys.exit(0 if result["valid"] else 1)
