@@ -9,15 +9,42 @@ description: Generate a Daily Intelligence Digest by autonomously discovering, s
 $ARGUMENTS
 ```
 
-Arguments format: `<topic> [--hints <hint1,hint2>]`
+Arguments format: `<topic> [--hints <hint1,hint2>] ["snippet1" "snippet2" ...]`
 
-- **topic** — required; the subject to research (max 100 chars, alphanumeric / hyphens / underscores)
+- **topic** — required; the subject to research (max 100 chars, alphanumeric / hyphens / underscores / spaces)
 - **--hints** — optional; comma-separated YouTube channels or @handles to prioritise (max 10, each ≤50 chars)
 - **snippets** — optional quoted strings for manual/test mode only; when present, discovery is skipped
+
+`$ARGUMENTS` is parsed into a canonical payload at Step 0. All subsequent steps read exclusively from that payload. See `.claude/skills/daily-digest/resources/invocation-contract.md` for the full schema and constraints.
 
 ---
 
 ## Outline
+
+### 0. Parse Invocation (Entrypoint)
+
+Parse `$ARGUMENTS` into the canonical invocation payload:
+
+1. If `--hints <value>` is present, extract the comma-separated value and split into a list → `hints`. Remove the `--hints` flag and its value from the argument string. If absent, `hints = []`.
+2. Extract any remaining quoted strings → `snippets`. Discard entries that are empty or contain only whitespace. If none remain, `snippets = []`.
+3. Treat all remaining non-flag tokens as a single space-joined string → `topic`.
+4. Serialize to compact JSON and store as `PAYLOAD_JSON`:
+
+```
+PAYLOAD_JSON = {"topic": "<topic>", "hints": [<hints>], "snippets": [<snippets>]}
+```
+
+Example — `/daily-digest "AI agents" --hints "channel1,channel2"`:
+```
+PAYLOAD_JSON = {"topic": "AI agents", "hints": ["channel1", "channel2"], "snippets": []}
+```
+
+Example — `/daily-digest "AI agents" "Snippet A" "Snippet B"`:
+```
+PAYLOAD_JSON = {"topic": "AI agents", "hints": [], "snippets": ["Snippet A", "Snippet B"]}
+```
+
+---
 
 ### 1. Preflight Checks
 
@@ -38,17 +65,25 @@ If either MCP tool is unavailable, warn the user and stop. Autonomous discovery 
 ### 2. Validate Input
 
 ```bash
-python .claude/skills/daily-digest/scripts/validate_input.py "$TOPIC" "$HINTS"
+python .claude/skills/daily-digest/scripts/validate_input.py "$PAYLOAD_JSON"
 ```
 
-Stop with the error message if validation fails.
+Parse the JSON output. If exit code is non-zero, stop immediately and report:
+
+```
+Error: {error}
+```
+
+Do not proceed to Step 3.
+
+If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snippets": ...}`. Use this validated payload for all subsequent steps.
 
 ---
 
 ### 3. Choose Mode
 
-- Snippets provided → skip to step 8 (manual/test mode)
-- No snippets → run steps 4–7 (autonomous discovery)
+- `payload.snippets` non-empty → skip to Step 8 (manual/test mode)
+- `payload.snippets` empty → run Steps 4–7 (autonomous discovery)
 
 ---
 
@@ -56,9 +91,9 @@ Stop with the error message if validation fails.
 
 Start all three simultaneously — do not wait for one before launching the next.
 
-- **Web agent**: `.claude/skills/daily-digest/agents/web-discovery-agent.md` — pass `{topic} [--hints {hint_domains}]`
-- **Video agent**: `.claude/skills/daily-digest/agents/video-discovery-agent.md` — pass `{topic} [--hints {hint_channels}]`
-- **Social agent**: `.claude/skills/daily-digest/agents/social-discovery-agent.md` — pass `{topic} [--hints {hint_handles}]`
+- **Web agent**: `.claude/skills/daily-digest/agents/web-discovery-agent.md` — pass `{payload.topic} [--hints {payload.hints joined by comma}]`
+- **Video agent**: `.claude/skills/daily-digest/agents/video-discovery-agent.md` — pass `{payload.topic} [--hints {payload.hints joined by comma}]`
+- **Social agent**: `.claude/skills/daily-digest/agents/social-discovery-agent.md` — pass `{payload.topic} [--hints {payload.hints joined by comma}]`
 
 Proceed with whatever results are available after 45 seconds.
 
@@ -114,7 +149,7 @@ If any section falls below its minimum, add the quality warning.
 ### 9. Build Output Path and Write Digest
 
 ```bash
-python .claude/skills/daily-digest/scripts/build_path.py "$TOPIC"
+python .claude/skills/daily-digest/scripts/build_path.py "$PAYLOAD_JSON"
 ```
 
 Assemble the markdown then write:
@@ -134,10 +169,10 @@ Return: `✅ Digest created: {file_path}`
 If all agents failed or zero credible sources were found, output:
 
 ```
-No relevant content discovered for '{topic}'.
+No relevant content discovered for '{payload.topic}'.
 
 Try providing content manually (test mode):
-/daily-digest "{topic}" "[snippet 1]" "[snippet 2]"
+/daily-digest "{payload.topic}" "[snippet 1]" "[snippet 2]"
 ```
 
 Do not write a file.

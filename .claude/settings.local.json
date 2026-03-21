@@ -35,7 +35,19 @@
       "Bash(sed -i -e 's|\\\\.claude/commands/skills\\\\.md|.claude/skills/daily-digest/daily-digest.md|g' -e 's|\\\\.claude/skills/autonomous-discovery\\\\.md|.claude/skills/daily-digest/daily-digest.md|g' -e 's|skills\\\\.md|daily-digest.md|g' \"C:/Users/priya/dev/signalflow/specs/daily-digest/tasks.md\")",
       "Bash(__NEW_LINE_14a01fc05f6349a9__ sed:*)",
       "Bash(powershell.exe -Command \".specify/scripts/powershell/create-new-feature.ps1 -Json -ShortName 'skill-invocation-layer' 'invocation layer for the skill. add clear entrypoint and optional snippets into a single payload orchestrator and helper scripts both use'\")",
-      "Bash(powershell.exe -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly\")"
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/setup-plan.ps1 -Json\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/update-agent-context.ps1 -AgentType claude\" 2>&1)",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
+      "Bash(Select-String -NotMatch \"conda\")",
+      "Bash(echo \"exit:$?\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/create-new-feature.ps1 ''source manifest output. write a sidecar JSON or yaml file with all discovered sources, credibility score, dedup decisions and section selections. that makes the digest auditable and much easier to debug'' -Json -ShortName ''source-manifest'' ''Source Manifest Output''\")",
+      "Bash(pwsh .specify/scripts/powershell/create-new-feature.ps1 \"Digest validation: add a post write validator that checks section counts, required evidence, broken formatting, and low signal warnings\" -Json -ShortName \"post-write-validator\")",
+      "Bash(powershell.exe -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\" 2>&1)",
+      "Bash(powershell.exe -File \".specify/scripts/powershell/create-new-feature.ps1\" \"Digest validation: add a post write validator that checks section counts, required evidence, broken formatting, and low signal warnings\" -Json -ShortName \"post-write-validator\" 2>&1)",
+      "Bash(powershell.exe -NoProfile -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json\" 2>&1)",
+      "Bash(git checkout:*)"
     ]
   }
 }
