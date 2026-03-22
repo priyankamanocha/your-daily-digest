@@ -27,12 +27,16 @@ Last updated: 2026-03-21
           │   ├── check_runtime.py     # Preflight checks
           │   ├── validate_input.py    # Input validation
           │   ├── build_path.py        # Output path generation
-          │   └── write_digest.py      # File writing
+          │   ├── write_digest.py      # File writing
+          │   └── load_source_filters.py  # Load & validate sources.json (I/O only)
           └── resources/
               ├── credibility-rules.md
               ├── freshness-policy.md
               ├── quality-rubric.md
               └── digest-template.md
+
+sources.json                           # Optional: allowlist/blocklist config (user-managed, gitignored)
+sources.json.example                   # Example config for reference
 
 digests/
   └── {YYYY}/{MM}/                     # Generated digest output

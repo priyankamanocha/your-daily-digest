@@ -38,7 +38,7 @@ Sources: {since_window.label | "manual" in snippets mode}
 
 ## Field Rules
 
-- **Title** (Insights, Actions): 5–10 words
+- **Title** (Insights, Actions): 5–20 words
 - **Description** (Insights): 2–3 sentences covering what / why / how
 - **Evidence**: Direct quote from source content — must appear in `"double quotes"`
 - **Anti-pattern evidence**: Full sentence quote from provided content

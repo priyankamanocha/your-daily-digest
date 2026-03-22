@@ -1,0 +1,20 @@
+{
+  "id": "set-06",
+  "type": "freshness",
+  "description": "Calendar month — 'feb 2026' resolves to 2026-02-01 through 2026-02-28",
+  "invocation": {
+    "topic": "freshness-test",
+    "since": "feb 2026",
+    "snippets": [
+      "Parallel subagents reduce latency by 60% compared to sequential execution for multi-source research tasks. Each subagent runs independently with its own context window, and results are merged in the parent skill.",
+      "Subagent batching is critical: 3-5 subagents per source type, 10-20 items each. One subagent per item causes excessive overhead and should be avoided.",
+      "Make sure subagents have independent scopes. Shared state between subagents causes blocking and eliminates the parallelism benefit entirely."
+    ]
+  },
+  "checks": {
+    "since_window_label": "1 Feb \u2013 28 Feb 2026",
+    "since_window_start_date": "2026-02-01",
+    "since_window_end_date": "2026-02-28",
+    "digest_created": true
+  }
+}

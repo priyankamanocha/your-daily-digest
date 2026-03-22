@@ -116,11 +116,11 @@ For each run:
 ### Step 6: Validate Titles
 
 **PASS Criteria** (automated check):
-- Insight titles: Count words in each title, verify all ≤ 10 words
+- Insight titles: Count words in each title, verify all ≤ 20 words
 - Format: Title is within `### [title]` markers
 
 **FAIL Criteria**:
-- Any insight title > 10 words
+- Any insight title > 20 words
 - Title format incorrect
 
 ### Step 7: Validate Against Benchmark Expectations
@@ -173,6 +173,34 @@ Resources should reference:
 - Whether extracted insights are truly non-obvious (vs obvious from content)
 - Whether insights answer what/why/how (rubric scoring)
 
+### Step 7b: Validate Freshness Filter (Sets 3–7)
+
+Run each invocation from `specs/daily-digest/benchmark.md` Sample Input Sets 3–7.
+
+**For Sets 3–6 (happy-path)** — after each run:
+
+1. Run `python .claude/skills/daily-digest/scripts/validate_input.py "$PAYLOAD_JSON"` and inspect `since_window`
+2. Read the generated digest and check the `Sources:` header line
+3. Confirm digest file was created at the expected path
+
+| Check | PASS if |
+|-------|---------|
+| Payload — since_window.label | Matches expected label for that set (see benchmark.md) |
+| Payload — since_window.start_date | Correct date relative to today |
+| Digest created | File exists at `digests/{YYYY}/{MM}/digest-{date}-freshness-test.md` |
+| Sources header line | `Sources: manual` (snippets mode) |
+
+**For Set 7 (error cases)** — for each of the three invalid invocations:
+
+1. Attempt to run `/daily-digest` with the invalid `--since` value
+2. Confirm no digest file was created
+3. Confirm the output contains the expected error string from benchmark.md
+
+| Check | PASS if |
+|-------|---------|
+| No file created | No digest at expected path |
+| Correct error message | Output contains the expected error string exactly |
+
 ### Step 8: Create Validation Report
 
 Generate `specs/daily-digest/automated-validation-report.md`:
@@ -205,7 +233,7 @@ Generate `specs/daily-digest/automated-validation-report.md`:
 | Insight Evidence | PASS/FAIL | All insights have quoted evidence |
 | Anti-pattern Evidence | PASS/FAIL | All anti-patterns have full-sentence quotes |
 | Resource Grounding | PASS/FAIL | All resource titles are direct quotes from content |
-| Insight Titles | PASS/FAIL | All insight titles ≤ 10 words |
+| Insight Titles | PASS/FAIL | All insight titles ≤ 20 words |
 | Benchmark Expectations | PASS/FAIL | Key insights/anti-patterns/resources match benchmark |
 | Quality Warning | PASS/FAIL | Not present (high-signal) |
 
@@ -237,7 +265,7 @@ Generate `specs/daily-digest/automated-validation-report.md`:
 | Insight Evidence | PASS/FAIL | All insights have quoted evidence |
 | Anti-pattern Evidence | PASS/FAIL | All anti-patterns have full-sentence quotes |
 | Resource Grounding | PASS/FAIL | All resource titles are direct quotes from content |
-| Insight Titles | PASS/FAIL | All insight titles ≤ 10 words |
+| Insight Titles | PASS/FAIL | All insight titles ≤ 20 words |
 | Benchmark Expectations | PASS/FAIL | Key insights/anti-patterns/resources match benchmark |
 | Quality Warning | PASS/FAIL | Not present (high-signal) |
 
@@ -251,16 +279,64 @@ Generate `specs/daily-digest/automated-validation-report.md`:
 
 ---
 
+## Freshness Filter (Sets 3–7)
+
+### Set 3: Default Window (no --since)
+
+| Check | Result | Details |
+|-------|--------|---------|
+| since_window.label | PASS/FAIL | `last 24 hours` |
+| since_window.start_date | PASS/FAIL | today − 1 day |
+| Digest created | PASS/FAIL | File exists at expected path |
+| Sources header | PASS/FAIL | `Sources: manual` |
+
+### Set 4: --since 7
+
+| Check | Result | Details |
+|-------|--------|---------|
+| since_window.label | PASS/FAIL | `last 7 days` |
+| since_window.start_date | PASS/FAIL | today − 7 days |
+| Digest created | PASS/FAIL | File exists at expected path |
+| Sources header | PASS/FAIL | `Sources: manual` |
+
+### Set 5: --since "last month"
+
+| Check | Result | Details |
+|-------|--------|---------|
+| since_window.label | PASS/FAIL | `last 30 days` |
+| since_window.start_date | PASS/FAIL | today − 30 days |
+| Digest created | PASS/FAIL | File exists at expected path |
+| Sources header | PASS/FAIL | `Sources: manual` |
+
+### Set 6: --since "feb 2026"
+
+| Check | Result | Details |
+|-------|--------|---------|
+| since_window.start_date | PASS/FAIL | `2026-02-01` |
+| since_window.end_date | PASS/FAIL | `2026-02-28` |
+| since_window.label | PASS/FAIL | `1 Feb – 28 Feb 2026` |
+| Digest created | PASS/FAIL | File exists at expected path |
+
+### Set 7: Invalid --since Inputs
+
+| Invocation | No file created | Correct error message | Result |
+|------------|-----------------|----------------------|--------|
+| `--since 0` | PASS/FAIL | PASS/FAIL | PASS/FAIL |
+| `--since ""` | PASS/FAIL | PASS/FAIL | PASS/FAIL |
+| `--since "next tuesday"` | PASS/FAIL | PASS/FAIL | PASS/FAIL |
+
+---
+
 ## Overall Validation Result
 
 ### Automated Checks
-- **Total Checks**: 16 (8 per Sample Input Set)
-- **Passed**: X/16
-- **Failed**: Y/16
+- **Total Checks**: 27 (8 per content set × 2, plus 11 freshness filter checks)
+- **Passed**: X/27
+- **Failed**: Y/27
 - **Status**: PASS / FAIL
 
 ### Manual Review Checks
-- **Total Manual Checks**: 6 (3 per Sample Input Set)
+- **Total Manual Checks**: 6 (3 per content input set)
 - **Status**: PENDING HUMAN REVIEW
 
 ---

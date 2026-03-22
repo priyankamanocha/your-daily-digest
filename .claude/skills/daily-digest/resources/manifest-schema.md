@@ -51,6 +51,7 @@ Collected in Step 4 from each agent's `SOURCE:` lines; scores added in Steps 5�
 | `credibility_score` | 0–3 or null | Per `credibility-rules.md`; `null` for snippets |
 | `credibility_signal` | string or null | Observable trust indicator; `null` for snippets |
 | `freshness_score` | 0–3 or null | Per `freshness-policy.md`; `null` if date unavailable |
+| `filter_action` | enum or null | `"blocked"` \| `"boosted"` \| `"unaffected"`; `null` for legacy manifests. Blocked sources remain in `sources` but are absent from `candidates`. |
 
 ---
 
@@ -77,7 +78,7 @@ Recorded in Step 7–8 for each deduplicated candidate, including those that fai
 
 ```json
 {
-  "title": "Candidate insight title (5-10 words)",
+  "title": "Candidate insight title (5-20 words)",
   "primary_source_url": "https://highest-credibility-source.com",
   "credibility_score": 3,
   "freshness_score": 2,

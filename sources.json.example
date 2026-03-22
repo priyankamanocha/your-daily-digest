@@ -1,0 +1,15 @@
+{
+  "global": {
+    "block": ["contentfarm.io", "@spambot"]
+  },
+  "topics": {
+    "AI safety": {
+      "allow": ["alignmentforum.org", "@paulchristiano"],
+      "block": ["hypesite.ai"]
+    },
+    "climate": {
+      "allow": ["carbonbrief.org"],
+      "block": ["denialblog.net", "oilsponsored.com"]
+    }
+  }
+}

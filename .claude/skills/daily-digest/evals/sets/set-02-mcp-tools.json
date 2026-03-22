@@ -1,0 +1,27 @@
+{
+  "id": "set-02",
+  "type": "digest",
+  "description": "High-signal content quality — MCP tools pattern",
+  "invocation": {
+    "topic": "mcp-tools",
+    "since": "1",
+    "snippets": [
+      "MCP (Model Context Protocol) tools abstract away authentication complexity. Instead of managing API keys, auth tokens, rate limits, and SDKs, you call an MCP server. The MCP handles the infrastructure. For web access, just call WebFetch MCP and get HTML parsed into markdown. No SDK dependency management.",
+      "I tried using three different Python HTTP libraries in the same project. Dependency hell. Version conflicts, auth token storage all different. Switched to MCP tools for web access. Single interface, no dependency versioning. Deployment simplified.",
+      "Not all APIs have MCP servers yet. Twitter does (via community MCPs). Web search does. But if you need a custom API, you either build an MCP for it or handle auth yourself. The value of MCP is clear: fewer moving parts."
+    ]
+  },
+  "checks": {
+    "quality_warning": false,
+    "section_counts": {
+      "insights": [1, 3],
+      "antipatterns": [2, 4],
+      "actions": [1, 3],
+      "resources": [3, 5]
+    },
+    "insight_title_max_words": 20,
+    "all_insights_have_evidence": true,
+    "all_insights_have_source": true,
+    "contains_strings": ["MCP", "authentication", "dependency"]
+  }
+}

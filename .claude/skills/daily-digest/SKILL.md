@@ -125,6 +125,20 @@ If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snip
 
 ---
 
+### 1.5. Load Source Filters
+
+```bash
+python .claude/skills/daily-digest/scripts/load_source_filters.py
+```
+
+| Exit code | Action |
+|-----------|--------|
+| `0` | Parse stdout JSON → store `FILTER_CONFIG = result.filter_config` |
+| `1` | Halt immediately: print `Error: {result.error}` and stop |
+| `2` | Set `FILTER_CONFIG = null` and continue (no filtering) |
+
+---
+
 ### 3.5. Diff Lookup
 
 If `payload.no_diff == true`, set `diff_baseline = {"found": false}` and proceed to Step 4.
@@ -174,6 +188,32 @@ Accumulate as `manifest_sources`. Set `manifest_dedup_groups = []`.
 
 ---
 
+### 4.5. Apply Source Filters
+
+If `FILTER_CONFIG` is null (no `sources.json`): set `filter_action = "unaffected"` on all records in `manifest_sources` and proceed to Step 5.
+
+Otherwise, resolve each source in `manifest_sources` against the filter config using this 4-tier precedence (first match wins):
+
+**Matching logic**:
+- Each entry in an `allow` or `block` array is either a domain (e.g. `"reuters.com"`) or a handle (e.g. `"@handle"`).
+- **Domain match**: extract the host from `source.url` (strip `https://`, `http://`, `www.` prefix, stop at first `/`). Match if host equals the entry exactly OR if host equals `www.{entry}` (so `"reuters.com"` matches both `reuters.com` and `www.reuters.com`). Match is case-insensitive.
+- **Handle match**: compare the entry (case-insensitive) against `source.author_or_handle`. Match if equal.
+- If `source.url` is null and the entry is a domain, skip — cannot match.
+
+**Topic lookup**: match `payload.topic` to a key in `FILTER_CONFIG.topics` using case-insensitive exact string comparison.
+
+**Precedence (apply in order; first match wins)**:
+
+1. Topic-level `block` — if the source matches any entry in `FILTER_CONFIG.topics[payload.topic].block` → `filter_action = "blocked"`
+2. Topic-level `allow` — if the source matches any entry in `FILTER_CONFIG.topics[payload.topic].allow` → `filter_action = "boosted"`
+3. Global `block` — if the source matches any entry in `FILTER_CONFIG.global.block` → `filter_action = "blocked"`
+4. Global `allow` — if the source matches any entry in `FILTER_CONFIG.global.allow` → `filter_action = "boosted"`
+5. No match → `filter_action = "unaffected"`
+
+Set `source.filter_action` on every record. Remove all records where `filter_action = "blocked"` from the active candidate pool (they remain in `manifest_sources` for auditability).
+
+---
+
 ### 5. Assess Discovery Status
 
 Merge all sources and record:
@@ -201,7 +241,7 @@ Apply scoring rules from `.claude/skills/daily-digest/resources/credibility-rule
 
 From credible sources only (score ≥ 2), extract 10–20 candidates. For each:
 
-- **Title**: 5–10 words
+- **Title**: 5–20 words
 - **Description**: 2–3 sentences (what / why / how)
 - **Evidence**: a direct quote from the source
 - **Source**: URL + publication name
@@ -225,7 +265,15 @@ Select final content:
 - **Actions**: 1–3 (concrete experiments derived from insights)
 - **Resources**: 3–5 (credible sources first, supplementary sources after)
 
-**Repeat filter** (applied after quality selection, before count enforcement):
+**Boosted source guarantee** (applied after normal quality scoring, before repeat filter):
+
+For each section, after ranking candidates by quality score:
+1. Identify all candidates with `filter_action = "boosted"` that have a date within `payload.since_window` (or within 30 days if no window) and score ≥ 2 on at least 1 quality dimension.
+2. For any boosted candidate not already selected: insert it into the section, ordered by quality score descending among boosted entries.
+3. If inserting a boosted candidate would exceed the section maximum: drop the lowest-ranking non-boosted candidate to make room.
+4. Edge case — all candidates in the section are boosted and total exceeds maximum: cap at the section maximum in boost-insertion order (do not drop any boosted candidates).
+
+**Repeat filter** (applied after boosted guarantee, before count enforcement):
 
 If `diff_baseline.found == true`, filter each section using the rules in `.claude/skills/daily-digest/resources/diffing-policy.md`:
 
