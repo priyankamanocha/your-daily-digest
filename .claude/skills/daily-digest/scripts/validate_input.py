@@ -11,11 +11,12 @@ Usage:
       "hints": [...],
       "snippets": [...],
       "since": "...",
-      "since_window": {"start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD", "label": "..."}
+      "since_window": {"start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD", "label": "..."},
+      "no_diff": false
     }
 
 Exit codes:
-    0 = valid; prints {"valid": true, "topic": ..., "hints": ..., "snippets": ..., "since": ..., "since_window": ...}
+    0 = valid; prints {"valid": true, "topic": ..., "hints": ..., "snippets": ..., "since": ..., "since_window": ..., "no_diff": ...}
     1 = invalid; prints {"valid": false, "error": "..."}
 
 See .claude/skills/daily-digest/resources/invocation-contract.md for field constraints.
@@ -38,6 +39,7 @@ def validate(payload: dict) -> dict:
     snippets = payload.get("snippets", [])
     since = payload.get("since", "1")
     since_window = payload.get("since_window", {})
+    no_diff = bool(payload.get("no_diff", False))
 
     # Topic
     if not topic:
@@ -93,6 +95,7 @@ def validate(payload: dict) -> dict:
         "snippets": snippets,
         "since": since,
         "since_window": since_window,
+        "no_diff": no_diff,
     }
 
 

@@ -21,11 +21,12 @@ DO NOT TRIGGER when:
 $ARGUMENTS
 ```
 
-Arguments format: `<topic> [--hints <hint1,hint2>] [--since <value>] ["snippet1" "snippet2" ...]`
+Arguments format: `<topic> [--hints <hint1,hint2>] [--since <value>] [--no-diff] ["snippet1" "snippet2" ...]`
 
 - **topic** — required; the subject to research (max 100 chars, alphanumeric / hyphens / underscores / spaces)
 - **--hints** — optional; comma-separated YouTube channels or @handles to prioritise (max 10, each ≤50 chars)
 - **--since** — optional; number of days or date expression to limit discovery (default: `1` = last 24 hours). Examples: `7`, `yesterday`, `last month`, `feb 2026`
+- **--no-diff** — optional flag; skips digest diffing and returns all discovered items unfiltered
 - **snippets** — optional quoted strings for manual/test mode only; when present, discovery is skipped
 
 `$ARGUMENTS` is parsed into a canonical payload at Step 0. All subsequent steps read exclusively from that payload. See `.claude/skills/daily-digest/resources/invocation-contract.md` for the full schema and constraints.
@@ -40,9 +41,10 @@ Parse `$ARGUMENTS` into the canonical invocation payload:
 
 1. If `--since <value>` is present, extract the value → `since_raw`. Remove the `--since` flag and its value from the argument string. If absent, `since_raw = "1"`.
 2. If `--hints <value>` is present, extract the comma-separated value and split into a list → `hints`. Remove the `--hints` flag and its value from the argument string. If absent, `hints = []`.
-3. Extract any remaining quoted strings → `snippets`. Discard entries that are empty or contain only whitespace. If none remain, `snippets = []`.
-4. Treat all remaining non-flag tokens as a single space-joined string → `topic`.
-5. Resolve `since_raw` into `since_window` using these rules (today = run date):
+3. If `--no-diff` is present as a standalone flag, set `no_diff = true` and remove it from the argument string. If absent, `no_diff = false`.
+4. Extract any remaining quoted strings → `snippets`. Discard entries that are empty or contain only whitespace. If none remain, `snippets = []`.
+5. Treat all remaining non-flag tokens as a single space-joined string → `topic`.
+6. Resolve `since_raw` into `since_window` using these rules (today = run date):
    - `since_raw` is empty string → **halt immediately**: `"--since requires a value. Use a number (days) or a phrase like 'yesterday', 'last month', or 'jan 2026'."`
    - `since_raw` is a positive integer string (e.g. `"1"`, `"7"`):
      - Parse N; if N < 1 → **halt**: `"since={N} is not valid — minimum value is 1."`
@@ -52,7 +54,7 @@ Parse `$ARGUMENTS` into the canonical invocation payload:
    - `since_raw = "last month"` (case-insensitive): `since_window = {start_date: today−30days, end_date: today, label: "last 30 days"}`
    - `since_raw` matches `"<month> <year>"` pattern (e.g. `"feb 2026"`, case-insensitive): `since_window = {start_date: first day of that month, end_date: last day of that month, label: "1 Feb – 28 Feb 2026"}`
    - Any other value → **halt immediately**: `"Could not interpret '--since {since_raw}'. Use a number (days) or a phrase like 'yesterday', 'last month', or 'jan 2026'."`
-6. Serialize to compact JSON and store as `PAYLOAD_JSON`:
+7. Serialize to compact JSON and store as `PAYLOAD_JSON`:
 
 ```
 PAYLOAD_JSON = {
@@ -60,23 +62,24 @@ PAYLOAD_JSON = {
   "hints": [<hints>],
   "snippets": [<snippets>],
   "since": "<since_raw>",
-  "since_window": {"start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD", "label": "<label>"}
+  "since_window": {"start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD", "label": "<label>"},
+  "no_diff": <no_diff>
 }
 ```
 
 Example — `/daily-digest "AI agents" --hints "channel1,channel2"` (no `--since`):
 ```
-PAYLOAD_JSON = {"topic": "AI agents", "hints": ["channel1", "channel2"], "snippets": [], "since": "1", "since_window": {"start_date": "2026-03-21", "end_date": "2026-03-22", "label": "last 24 hours"}}
+PAYLOAD_JSON = {"topic": "AI agents", "hints": ["channel1", "channel2"], "snippets": [], "since": "1", "since_window": {"start_date": "2026-03-21", "end_date": "2026-03-22", "label": "last 24 hours"}, "no_diff": false}
 ```
 
 Example — `/daily-digest "AI agents" --since 7`:
 ```
-PAYLOAD_JSON = {"topic": "AI agents", "hints": [], "snippets": [], "since": "7", "since_window": {"start_date": "2026-03-15", "end_date": "2026-03-22", "label": "last 7 days"}}
+PAYLOAD_JSON = {"topic": "AI agents", "hints": [], "snippets": [], "since": "7", "since_window": {"start_date": "2026-03-15", "end_date": "2026-03-22", "label": "last 7 days"}, "no_diff": false}
 ```
 
 Example — `/daily-digest "AI agents" "Snippet A" "Snippet B"`:
 ```
-PAYLOAD_JSON = {"topic": "AI agents", "hints": [], "snippets": ["Snippet A", "Snippet B"], "since": "1", "since_window": {"start_date": "2026-03-21", "end_date": "2026-03-22", "label": "last 24 hours"}}
+PAYLOAD_JSON = {"topic": "AI agents", "hints": [], "snippets": ["Snippet A", "Snippet B"], "since": "1", "since_window": {"start_date": "2026-03-21", "end_date": "2026-03-22", "label": "last 24 hours"}, "no_diff": false}
 ```
 
 ---
@@ -111,7 +114,7 @@ Error: {error}
 
 Do not proceed to Step 3.
 
-If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snippets": ..., "since": ..., "since_window": {...}}`. Use this validated payload for all subsequent steps.
+If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snippets": ..., "since": ..., "since_window": {...}, "no_diff": ...}`. Use this validated payload for all subsequent steps.
 
 ---
 

@@ -15,7 +15,8 @@ Both `daily-digest.md` (Outline Step 0) and all affected helper scripts referenc
     "start_date": "YYYY-MM-DD",
     "end_date": "YYYY-MM-DD",
     "label": "<string>"
-  }
+  },
+  "no_diff": false
 }
 ```
 
@@ -28,6 +29,7 @@ Both `daily-digest.md` (Outline Step 0) and all affected helper scripts referenc
 | `snippets` | list[string] | No | `[]` | Pre-supplied content strings for test/manual mode |
 | `since` | string | No | `"1"` | Raw `--since` value from user input |
 | `since_window` | object | No | 24-hour window | Resolved date range for discovery filtering |
+| `no_diff` | bool | No | `false` | When `true`, skip digest diffing entirely; all discovered items pass through unfiltered |
 
 ## Field Constraints
 
@@ -56,14 +58,15 @@ Both `daily-digest.md` (Outline Step 0) and all affected helper scripts referenc
 
 ## Parsing Rules (applied at Step 0)
 
-Input: `<topic> [--hints <h1,h2,...>] [--since <value>] ["snippet1" "snippet2" ...]`
+Input: `<topic> [--hints <h1,h2,...>] [--since <value>] [--no-diff] ["snippet1" "snippet2" ...]`
 
 1. Extract `--since <value>` if present → `since_raw`; remove flag and value from string. If absent, `since_raw = "1"`.
 2. Extract `--hints <value>` if present → comma-split → `hints` list; remove flag and value from string.
-3. Extract remaining quoted strings → `snippets` list; discard empty or whitespace-only entries.
-4. Remaining non-flag tokens → space-join → `topic` string.
-5. Resolve `since_raw` → `since_window` (see Resolution Rules below).
-6. Serialize full payload to `PAYLOAD_JSON`.
+3. If `--no-diff` is present as a standalone flag, set `no_diff = true` and remove it from string; otherwise `no_diff = false`.
+4. Extract remaining quoted strings → `snippets` list; discard empty or whitespace-only entries.
+5. Remaining non-flag tokens → space-join → `topic` string.
+6. Resolve `since_raw` → `since_window` (see Resolution Rules below).
+7. Serialize full payload to `PAYLOAD_JSON`.
 
 `--since` is parsed before `--hints`. Argument order does not matter for flags.
 
