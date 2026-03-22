@@ -9,7 +9,7 @@ description: Discover recent YouTube video content on a topic, extracting key cl
 $ARGUMENTS
 ```
 
-Arguments: `<topic> [--hints <channel1,channel2>]`
+Arguments: `<topic> [--hints <channel1,channel2>] --since-start <YYYY-MM-DD>`
 
 ---
 
@@ -39,6 +39,8 @@ For each video URL, use `WebFetch` to retrieve the page. Extract:
 - **summary** — 2–3 sentences drawn from transcript snippets, description, or chapter titles covering what is most relevant to the topic
 
 Skip videos with no transcript, description, or retrievable content.
+
+After extracting the date: if the upload date is known and falls before `--since-start`, skip the video. If no date can be determined, include the source but append `[undated]` to the summary field.
 
 ### 4. Return Sources
 
