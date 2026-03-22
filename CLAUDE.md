@@ -18,7 +18,7 @@ Last updated: 2026-03-21
   ├── commands/                        # Slash commands (/validate-digest, /speckit.*)
   └── skills/
       └── daily-digest/
-          ├── daily-digest.md          # Orchestrator skill
+          ├── SKILL.md                 # Orchestrator skill
           ├── agents/
           │   ├── web-discovery-agent.md
           │   ├── video-discovery-agent.md
@@ -45,11 +45,11 @@ specs/
 
 | Skill | Location | Description |
 |-------|----------|-------------|
-| `daily-digest` | `.claude/skills/daily-digest/daily-digest.md` | Autonomous discovery via parallel agents. Snippets accepted for testing only. |
+| `daily-digest` | `.claude/skills/daily-digest/SKILL.md` | Autonomous discovery via parallel agents. Snippets accepted for testing only. |
 
 ## Implementation Style
 
-- **Single skill** — all execution logic in `daily-digest.md`
+- **Single skill** — all execution logic in `SKILL.md`
 - **Agents as skills** — each discovery agent is a separate skill file under `agents/`
 - **Reference material** — rubrics, templates, policies live in `resources/`, not inline
 - **Python utility scripts** — I/O only (`scripts/`); no business logic
