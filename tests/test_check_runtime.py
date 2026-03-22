@@ -1,12 +1,12 @@
-"""Tests for check_runtime.py"""
+"""Tests for check_runtime.py."""
 import sys
 import os
 import unittest
 from unittest.mock import patch
-import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".claude", "skills", "daily-digest", "scripts"))
 from check_runtime import check_python_version, check_digests_writable
+from temp_utils import make_temp_dir, remove_temp_dir
 
 
 class TestCheckPythonVersion(unittest.TestCase):
@@ -43,11 +43,14 @@ class TestCheckPythonVersion(unittest.TestCase):
 
 class TestCheckDigestsWritable(unittest.TestCase):
     def test_writable_directory_passes(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        tmp = make_temp_dir()
+        try:
             target = os.path.join(tmp, "digests")
             with patch("check_runtime.Path") as mock_path_cls:
                 mock_path_cls.return_value = _FakePath(target)
                 ok, msg = check_digests_writable()
+        finally:
+            remove_temp_dir(tmp)
         self.assertTrue(ok)
         self.assertIn("writable", msg)
 
@@ -60,10 +63,8 @@ class TestCheckDigestsWritable(unittest.TestCase):
 
 
 class _FakePath:
-    """A writable fake path backed by a real temp dir."""
     def __init__(self, real_dir):
         self._dir = real_dir
-        self._probe = os.path.join(real_dir, ".write_probe")
 
     def mkdir(self, **kwargs):
         os.makedirs(self._dir, exist_ok=True)
@@ -77,15 +78,14 @@ class _FakeProbe:
         self._path = path
 
     def write_text(self, content):
-        with open(self._path, "w") as f:
-            f.write(content)
+        with open(self._path, "w", encoding="utf-8") as handle:
+            handle.write(content)
 
     def unlink(self):
         os.unlink(self._path)
 
 
 class _ErrorPath:
-    """A path that always raises OSError."""
     def mkdir(self, **kwargs):
         raise OSError("permission denied")
 
