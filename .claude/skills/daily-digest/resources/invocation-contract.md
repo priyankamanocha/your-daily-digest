@@ -6,7 +6,7 @@ Both `daily-digest.md` (Outline Step 0) and all affected helper scripts referenc
 ## Payload Schema
 
 ```json
-{"topic": "<string>", "hints": ["<string>", ...], "snippets": ["<string>", ...]}
+{"topic": "<string>", "hints": ["<string>", ...], "snippets": ["<string>", ...], "no_diff": false}
 ```
 
 ## Field Definitions
@@ -16,6 +16,7 @@ Both `daily-digest.md` (Outline Step 0) and all affected helper scripts referenc
 | `topic` | string | Yes | — | Subject to research |
 | `hints` | list[string] | No | `[]` | YouTube channels or @handles to prioritise |
 | `snippets` | list[string] | No | `[]` | Pre-supplied content strings for test/manual mode |
+| `no_diff` | bool | No | `false` | When `true`, skip digest diffing entirely; all discovered items pass through unfiltered |
 
 ## Field Constraints
 
@@ -37,11 +38,12 @@ Both `daily-digest.md` (Outline Step 0) and all affected helper scripts referenc
 
 ## Parsing Rules (applied at Step 0)
 
-Input: `<topic> [--hints <h1,h2,...>] ["snippet1" "snippet2" ...]`
+Input: `<topic> [--hints <h1,h2,...>] [--no-diff] ["snippet1" "snippet2" ...]`
 
 1. Extract `--hints <value>` if present → comma-split → `hints` list; remove flag and value from string
-2. Extract remaining quoted strings → `snippets` list; discard empty or whitespace-only entries
-3. Remaining non-flag tokens → space-join → `topic` string
+2. If `--no-diff` is present as a standalone flag, set `no_diff = true` and remove it from string; otherwise `no_diff = false`
+3. Extract remaining quoted strings → `snippets` list; discard empty or whitespace-only entries
+4. Remaining non-flag tokens → space-join → `topic` string
 
 ## Validation
 

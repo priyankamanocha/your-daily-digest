@@ -5,10 +5,11 @@ Validate the canonical invocation payload for the daily-digest skill.
 Usage:
     python validate_input.py <payload_json>
 
-    Where <payload_json> is a JSON string: {"topic": "...", "hints": [...], "snippets": [...]}
+    Where <payload_json> is a JSON string:
+        {"topic": "...", "hints": [...], "snippets": [...], "no_diff": false}
 
 Exit codes:
-    0 = valid; prints {"valid": true, "topic": ..., "hints": ..., "snippets": ...}
+    0 = valid; prints {"valid": true, "topic": ..., "hints": ..., "snippets": ..., "no_diff": ...}
     1 = invalid; prints {"valid": false, "error": "..."}
 
 See .claude/skills/daily-digest/resources/invocation-contract.md for field constraints.
@@ -28,6 +29,7 @@ def validate(payload: dict) -> dict:
     topic = payload.get("topic", "")
     hints = payload.get("hints", [])
     snippets = payload.get("snippets", [])
+    no_diff = bool(payload.get("no_diff", False))
 
     # Topic
     if not topic:
@@ -48,7 +50,7 @@ def validate(payload: dict) -> dict:
             return {"valid": False, "error": f'hint "{h[:20]}..." exceeds {HINTS_MAX_LEN} characters'}
 
     # Snippets pass through without validation
-    return {"valid": True, "topic": topic, "hints": hints, "snippets": snippets}
+    return {"valid": True, "topic": topic, "hints": hints, "snippets": snippets, "no_diff": no_diff}
 
 
 if __name__ == "__main__":

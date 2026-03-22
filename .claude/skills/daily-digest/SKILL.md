@@ -21,10 +21,11 @@ DO NOT TRIGGER when:
 $ARGUMENTS
 ```
 
-Arguments format: `<topic> [--hints <hint1,hint2>] ["snippet1" "snippet2" ...]`
+Arguments format: `<topic> [--hints <hint1,hint2>] [--no-diff] ["snippet1" "snippet2" ...]`
 
 - **topic** — required; the subject to research (max 100 chars, alphanumeric / hyphens / underscores / spaces)
 - **--hints** — optional; comma-separated YouTube channels or @handles to prioritise (max 10, each ≤50 chars)
+- **--no-diff** — optional flag; skips digest diffing and returns all discovered items unfiltered
 - **snippets** — optional quoted strings for manual/test mode only; when present, discovery is skipped
 
 `$ARGUMENTS` is parsed into a canonical payload at Step 0. All subsequent steps read exclusively from that payload. See `.claude/skills/daily-digest/resources/invocation-contract.md` for the full schema and constraints.
@@ -38,22 +39,23 @@ Arguments format: `<topic> [--hints <hint1,hint2>] ["snippet1" "snippet2" ...]`
 Parse `$ARGUMENTS` into the canonical invocation payload:
 
 1. If `--hints <value>` is present, extract the comma-separated value and split into a list → `hints`. Remove the `--hints` flag and its value from the argument string. If absent, `hints = []`.
-2. Extract any remaining quoted strings → `snippets`. Discard entries that are empty or contain only whitespace. If none remain, `snippets = []`.
-3. Treat all remaining non-flag tokens as a single space-joined string → `topic`.
-4. Serialize to compact JSON and store as `PAYLOAD_JSON`:
+2. If `--no-diff` is present as a standalone flag, set `no_diff = true` and remove it from the argument string. If absent, `no_diff = false`.
+3. Extract any remaining quoted strings → `snippets`. Discard entries that are empty or contain only whitespace. If none remain, `snippets = []`.
+4. Treat all remaining non-flag tokens as a single space-joined string → `topic`.
+5. Serialize to compact JSON and store as `PAYLOAD_JSON`:
 
 ```
-PAYLOAD_JSON = {"topic": "<topic>", "hints": [<hints>], "snippets": [<snippets>]}
+PAYLOAD_JSON = {"topic": "<topic>", "hints": [<hints>], "snippets": [<snippets>], "no_diff": <no_diff>}
 ```
 
 Example — `/daily-digest "AI agents" --hints "channel1,channel2"`:
 ```
-PAYLOAD_JSON = {"topic": "AI agents", "hints": ["channel1", "channel2"], "snippets": []}
+PAYLOAD_JSON = {"topic": "AI agents", "hints": ["channel1", "channel2"], "snippets": [], "no_diff": false}
 ```
 
 Example — `/daily-digest "AI agents" "Snippet A" "Snippet B"`:
 ```
-PAYLOAD_JSON = {"topic": "AI agents", "hints": [], "snippets": ["Snippet A", "Snippet B"]}
+PAYLOAD_JSON = {"topic": "AI agents", "hints": [], "snippets": ["Snippet A", "Snippet B"], "no_diff": false}
 ```
 
 ---
@@ -88,7 +90,7 @@ Error: {error}
 
 Do not proceed to Step 3.
 
-If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snippets": ...}`. Use this validated payload for all subsequent steps.
+If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snippets": ..., "no_diff": ...}`. Use this validated payload for all subsequent steps.
 
 ---
 
@@ -96,6 +98,30 @@ If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snip
 
 - `payload.snippets` non-empty → **Snippets mode**: build synthetic source records for each snippet (see Step 4 snippets section), set `manifest_discovery_status = "manual"`, `manifest_agents_succeeded = []`, `manifest_agents_failed = []`, then skip to Step 8
 - `payload.snippets` empty → run Steps 4–7 (autonomous discovery)
+
+---
+
+### 3.5. Diff Lookup
+
+If `payload.no_diff == true`, set `diff_baseline = {"found": false}` and proceed to Step 4.
+
+Otherwise:
+
+1. Derive the topic slug from `payload.topic` using the same logic as `build_path.py`:
+   - Lowercase the topic
+   - Replace spaces with hyphens
+   - Strip any character that is not alphanumeric or a hyphen
+   - Truncate to 50 characters
+   - Store as `<derived_slug>`
+
+2. Run:
+   ```bash
+   python .claude/skills/daily-digest/scripts/diff_digest.py <derived_slug>
+   ```
+
+3. Parse the JSON output into `diff_baseline`.
+   - If the script exits with code 1, or the output cannot be parsed, set `diff_baseline = {"found": false}` and continue.
+   - If `diff_baseline.found == false` (no qualifying baseline), proceed normally — all items will pass through unfiltered.
 
 ---
 
@@ -175,7 +201,22 @@ Select final content:
 - **Actions**: 1–3 (concrete experiments derived from insights)
 - **Resources**: 3–5 (credible sources first, supplementary sources after)
 
-If any section falls below its minimum, add the quality warning.
+**Repeat filter** (applied after quality selection, before count enforcement):
+
+If `diff_baseline.found == true`, filter each section using the rules in `.claude/skills/daily-digest/resources/diffing-policy.md`:
+
+For each selected item, compute its **title token set**: lowercase the title, strip punctuation, remove stopwords listed in diffing-policy.md. Then for each item in the same section of `diff_baseline.sections`:
+- Check if the item's **`**Source**:` attribution** (case-insensitive, trimmed) matches the baseline item's source.
+- Compute Jaccard similarity: `|intersection(title_tokens_A, title_tokens_B)| / |union(title_tokens_A, title_tokens_B)|`.
+- If **both** conditions hold (source matches AND Jaccard ≥ 0.5), classify the item as a repeat and remove it from the section.
+
+After filtering, accumulate:
+- `suppressed_count` — total items removed across all four sections (integer, starts at 0)
+- `suppressed_baseline_date` — `diff_baseline.baseline_date` (used in the footer note at Step 9)
+
+If `diff_baseline.found == false`, skip the repeat filter entirely: `suppressed_count = 0`.
+
+If any section falls below its minimum after filtering, add the quality warning.
 
 **Manifest data**: As each section's content is finalised, record a `SelectionItem` (`title`, `primary_source_url`) for each selected item. Accumulate as `manifest_section_selections` with keys `key_insights`, `antipatterns`, `actions`, `resources`. Set `manifest_quality_warning = true` if the quality warning was triggered, otherwise `false`.
 
@@ -194,6 +235,14 @@ python .claude/skills/daily-digest/scripts/write_digest.py "$FILE_PATH" "$CONTEN
 ```
 
 **Digest format**: see `.claude/skills/daily-digest/resources/digest-template.md`
+
+**Diff footer** (append before calling `write_digest.py`): If `suppressed_count > 0`, append the following line to the digest markdown content:
+
+```
+_N item(s) suppressed as already covered in digest from YYYY-MM-DD._
+```
+
+Where `N` = `suppressed_count` and `YYYY-MM-DD` = `suppressed_baseline_date`. If `suppressed_count == 0`, append nothing.
 
 **Write manifest**: After writing the digest, assemble the manifest payload from all accumulated manifest data:
 
