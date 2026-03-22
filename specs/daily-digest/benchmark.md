@@ -1,4 +1,4 @@
-# SignalFlow Benchmark
+# your-daily-brief Benchmark
 
 **Purpose**: Sample inputs and expected-quality outputs for testing digest quality consistently.
 

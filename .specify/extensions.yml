@@ -1,4 +1,4 @@
-# SignalFlow speckit extension hooks
+# your-daily-brief speckit extension hooks
 # Runs slash commands automatically at key points in the speckit workflow.
 
 hooks:

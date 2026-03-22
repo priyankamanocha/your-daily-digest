@@ -1,4 +1,4 @@
-# signalflow
+# your-daily-brief
 
 A Claude Code skill that autonomously discovers and synthesises high-quality intelligence digests on any topic. Parallel agents search the web, video, and social sources — then score, deduplicate, and assemble insights, anti-patterns, actions, and resources that meet a strict quality rubric.
 
