@@ -19,7 +19,7 @@ Templates reviewed:
 Deferred items:      none
 -->
 
-# your-daily-brief Constitution
+# your-daily-digest Constitution
 
 ## Core Principles
 
