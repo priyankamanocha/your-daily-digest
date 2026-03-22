@@ -114,6 +114,161 @@ The value of MCP is clear: fewer moving parts.
 
 ---
 
+---
+
+## Sample Input Sets 3–7: Since Freshness Filter
+
+These sets test `--since` flag parsing, `since_window` resolution, and error handling. Content quality is not the focus — checks are on payload correctness and digest header output.
+
+**Reusable snippets** (used for all happy-path sets):
+
+```
+Snippet A: Parallel subagents reduce latency by 60% compared to sequential execution for multi-source research tasks. Each subagent runs independently with its own context window, and results are merged in the parent skill.
+Snippet B: Subagent batching is critical: 3-5 subagents per source type, 10-20 items each. One subagent per item causes excessive overhead and should be avoided.
+Snippet C: Make sure subagents have independent scopes. Shared state between subagents causes blocking and eliminates the parallelism benefit entirely.
+```
+
+---
+
+### Sample Input Set 3: Default Window (no --since flag)
+
+**Invocation**:
+```
+/daily-digest freshness-test "Snippet A" "Snippet B" "Snippet C"
+```
+
+**Expected payload** (from `validate_input.py`):
+```json
+{"since": "1", "since_window": {"start_date": "{today-1}", "end_date": "{today}", "label": "last 24 hours"}}
+```
+
+**Expected digest header**:
+```
+Sources: manual
+```
+*(snippets mode always uses "manual" for Sources, regardless of since_window)*
+
+**PASS Criteria**:
+- `validate_input.py` exits 0, `since = "1"`, `since_window.label = "last 24 hours"`
+- Digest file created at expected path
+- `Sources: manual` present in header
+
+**FAIL Criteria**:
+- Skill halts with error
+- `since_window` missing or incorrect
+- Digest file not created
+
+---
+
+### Sample Input Set 4: Numeric Override (--since 7)
+
+**Invocation**:
+```
+/daily-digest freshness-test --since 7 "Snippet A" "Snippet B" "Snippet C"
+```
+
+**Expected payload**:
+```json
+{"since": "7", "since_window": {"start_date": "{today-7}", "end_date": "{today}", "label": "last 7 days"}}
+```
+
+**Expected digest header**:
+```
+Sources: manual
+```
+
+**PASS Criteria**:
+- `since = "7"`, `since_window.label = "last 7 days"`
+- Digest file created; structure valid
+
+**FAIL Criteria**:
+- Skill halts with error
+- `since_window.label` says "last 24 hours" (default incorrectly applied)
+
+---
+
+### Sample Input Set 5: Natural Language — "last month"
+
+**Invocation**:
+```
+/daily-digest freshness-test --since "last month" "Snippet A" "Snippet B" "Snippet C"
+```
+
+**Expected payload**:
+```json
+{"since": "last month", "since_window": {"start_date": "{today-30}", "end_date": "{today}", "label": "last 30 days"}}
+```
+
+**PASS Criteria**:
+- `since_window.label = "last 30 days"`
+- Digest file created; structure valid
+
+**FAIL Criteria**:
+- Skill halts with parse error
+- `since_window` resolves to wrong dates
+
+---
+
+### Sample Input Set 6: Calendar Month — "feb 2026"
+
+**Invocation**:
+```
+/daily-digest freshness-test --since "feb 2026" "Snippet A" "Snippet B" "Snippet C"
+```
+
+**Expected payload**:
+```json
+{"since": "feb 2026", "since_window": {"start_date": "2026-02-01", "end_date": "2026-02-28", "label": "1 Feb – 28 Feb 2026"}}
+```
+
+**PASS Criteria**:
+- `since_window.start_date = "2026-02-01"`, `since_window.end_date = "2026-02-28"`
+- `since_window.label = "1 Feb – 28 Feb 2026"`
+- Digest file created; structure valid
+
+**FAIL Criteria**:
+- Skill halts with parse error
+- Wrong start/end dates (e.g. wrong month length)
+
+---
+
+### Sample Input Set 7: Invalid --since Inputs (Error Cases)
+
+Each invocation below MUST halt before creating any digest file. No file should exist at the expected output path.
+
+| Invocation | Expected error message |
+|------------|----------------------|
+| `/daily-digest freshness-test --since 0 "Snippet A"` | `since=0 is not valid — minimum value is 1.` |
+| `/daily-digest freshness-test --since "" "Snippet A"` | `--since requires a value. Use a number (days) or a phrase like 'yesterday', 'last month', or 'jan 2026'.` |
+| `/daily-digest freshness-test --since "next tuesday" "Snippet A"` | `Could not interpret '--since next tuesday'. Use a number (days) or a phrase like 'yesterday', 'last month', or 'jan 2026'.` |
+
+**PASS Criteria** (for each error case):
+- No digest file created
+- Output contains the expected error string
+
+**FAIL Criteria**:
+- Digest file is created despite invalid input
+- Skill silently falls back to default instead of halting
+- Error message does not match expected text
+
+---
+
+### Freshness Scoring Reference
+
+When running in autonomous mode (no snippets), sources are scored by publication age:
+
+| Score | Age | Example |
+|-------|-----|---------|
+| 3 | < 2 days | Published yesterday |
+| 2 | 2–7 days | Published last week |
+| 1 | 8–30 days | Published 3 weeks ago |
+| 0 | > 30 days | Published last month |
+| null | No date | Undated source — included, not scored |
+
+Freshness score influences candidate ranking but does not gate inclusion on its own (quality rubric determines inclusion). Undated sources must never be silently excluded.
+
+---
+
 ## Quality Rubric Application Guide
 
 ### ✅ Insight PASSES If:
