@@ -9,7 +9,7 @@ description: Discover quality X/Twitter discussions on a topic, prioritising ver
 $ARGUMENTS
 ```
 
-Arguments: `<topic> [--hints <@handle1,@handle2>]`
+Arguments: `<topic> [--hints <@handle1,@handle2>] --since-start <YYYY-MM-DD>`
 
 ---
 
@@ -42,6 +42,8 @@ For each post or thread URL, use `WebFetch` to retrieve the content. Extract:
 - **summary** — 2–3 sentences capturing the main claim, insight, or discussion from the post or thread
 
 Skip posts that are purely promotional, spam, or have no substantive content.
+
+After extracting the date: if the post date is known and falls before `--since-start`, skip the post. If no date can be determined, include the source but append `[undated]` to the summary field.
 
 ### 4. Return Sources
 

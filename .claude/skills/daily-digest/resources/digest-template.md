@@ -5,6 +5,7 @@
 
 Generated: {YYYY-MM-DD HH:MM}
 Discovery: {complete | partial — X unavailable | timeout — partial results used | manual}
+Sources: {since_window.label | "manual" in snippets mode}
 
 ## Key Insights (1–3)
 
@@ -44,3 +45,4 @@ Discovery: {complete | partial — X unavailable | timeout — partial results u
 - **Resource title**: Direct quote or literal phrase from source content (not paraphrased)
 - **Action Steps**: Numbered list
 - **Discovery line**: Use `manual` when snippets were provided; otherwise use completion status from agents
+- **Sources line**: Use `since_window.label` from the resolved payload (e.g. `last 24 hours`, `last 7 days`, `1 Feb – 28 Feb 2026`); use `manual` in snippets mode

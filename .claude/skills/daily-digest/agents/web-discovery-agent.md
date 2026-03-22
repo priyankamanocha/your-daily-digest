@@ -9,7 +9,7 @@ description: Discover recent, credible web content on a topic by running paralle
 $ARGUMENTS
 ```
 
-Arguments: `<topic> [--hints <domains>]`
+Arguments: `<topic> [--hints <domains>] --since-start <YYYY-MM-DD>`
 
 ---
 
@@ -39,6 +39,8 @@ For each URL, use `WebFetch` to retrieve the page. Extract:
 - **summary** — 2–3 sentences covering the most relevant content for the topic
 
 Skip paywalled pages, error pages, and pages with no relevant content.
+
+After extracting the date: if the publication date is known and falls before `--since-start`, skip the source. If no date can be determined, include the source but append `[undated]` to the summary field.
 
 ### 4. Return Sources
 
