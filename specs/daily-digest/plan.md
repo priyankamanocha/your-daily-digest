@@ -12,7 +12,7 @@ Autonomous-first daily digest skill. Users provide topic + optional hints (YouTu
 **Language/Version**: Claude Code skill (prompt-based) + Python 3.8+ stdlib scripts
 **Architecture**: Multi-agent parallel discovery
   - **Primary entry**: `/daily-digest <topic> [--hints channels,@handles]`
-  - **Orchestrator**: `.claude/skills/daily-digest/daily-digest.md`
+  - **Orchestrator**: `.claude/skills/daily-digest/SKILL.md`
   - **Agents**: 3 separate skill files under `agents/` (web, video, social) — spawned in parallel
   - **Scripts**: Python I/O helpers in `scripts/` (validate_input, build_path, write_digest, check_runtime)
   - **Resources**: Reference material in `resources/` (credibility rules, freshness policy, quality rubric, digest template)
@@ -63,7 +63,7 @@ specs/daily-digest/
 
 ```text
 .claude/skills/daily-digest/
-├── daily-digest.md              # Orchestrator skill
+├── SKILL.md                     # Orchestrator skill
 ├── agents/
 │   ├── web-discovery-agent.md   # Web discovery (web_search + fetch)
 │   ├── video-discovery-agent.md # YouTube discovery
@@ -82,7 +82,7 @@ specs/daily-digest/
 digests/{YYYY}/{MM}/             # Generated output
 ```
 
-**Orchestrator flow** (`daily-digest.md`):
+**Orchestrator flow** (`SKILL.md`):
 1. Preflight checks (Python, MCP tools, digests/ writable)
 2. Validate input (topic + hints)
 3. Mode select (snippets → manual; none → autonomous)
