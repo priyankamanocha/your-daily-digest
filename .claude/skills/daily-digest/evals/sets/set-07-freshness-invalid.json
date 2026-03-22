@@ -1,0 +1,19 @@
+{
+  "id": "set-07",
+  "type": "error",
+  "description": "Invalid --since inputs halt with correct error messages; no digest created",
+  "cases": [
+    {
+      "since": "0",
+      "expected_error": "since=0 is not valid \u2014 minimum value is 1."
+    },
+    {
+      "since": "",
+      "expected_error": "--since requires a value."
+    },
+    {
+      "since": "next tuesday",
+      "expected_error": "Could not interpret '--since next tuesday'."
+    }
+  ]
+}

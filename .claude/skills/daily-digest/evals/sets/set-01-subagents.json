@@ -1,0 +1,27 @@
+{
+  "id": "set-01",
+  "type": "digest",
+  "description": "High-signal content quality — subagents pattern",
+  "invocation": {
+    "topic": "claude-code",
+    "since": "1",
+    "snippets": [
+      "Subagents in Claude Code enable parallel execution of independent tasks. Each subagent runs as a separate Claude instance with its own context window. Subagents are particularly effective for multi-source research, where you need to fetch from YouTube, Twitter, and web simultaneously without blocking. Returns are merged and synthesized in the parent skill, reducing latency by 60% compared to sequential execution.",
+      "I used subagents to parallelize a content retrieval task. I had 3 sources: YouTube for videos, Twitter for commentary, and blogs for long-form analysis. Running these sequentially took 6 minutes. With 3 parallel subagents, it dropped to 2 minutes. The key insight: make sure subagents have independent scopes so they don't block on shared state.",
+      "Subagents are powerful but easy to misuse. I initially created one subagent per item to fetch (50 items = 50 subagents). That was a mistake—too much overhead. Instead, I create 3-5 subagents per source type. Each subagent batches 10-20 items. That's the sweet spot for our use case."
+    ]
+  },
+  "checks": {
+    "quality_warning": false,
+    "section_counts": {
+      "insights": [1, 3],
+      "antipatterns": [2, 4],
+      "actions": [1, 3],
+      "resources": [3, 5]
+    },
+    "insight_title_max_words": 20,
+    "all_insights_have_evidence": true,
+    "all_insights_have_source": true,
+    "contains_strings": ["60%", "3-5 subagents", "shared state"]
+  }
+}

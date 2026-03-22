@@ -1,0 +1,20 @@
+{
+  "id": "set-03",
+  "type": "freshness",
+  "description": "Default window — no --since flag resolves to last 24 hours",
+  "invocation": {
+    "topic": "freshness-test",
+    "since": "1",
+    "snippets": [
+      "Parallel subagents reduce latency by 60% compared to sequential execution for multi-source research tasks. Each subagent runs independently with its own context window, and results are merged in the parent skill.",
+      "Subagent batching is critical: 3-5 subagents per source type, 10-20 items each. One subagent per item causes excessive overhead and should be avoided.",
+      "Make sure subagents have independent scopes. Shared state between subagents causes blocking and eliminates the parallelism benefit entirely."
+    ]
+  },
+  "checks": {
+    "since_window_label": "last 24 hours",
+    "since_window_start_offset_days": 1,
+    "since_window_end_is_today": true,
+    "digest_created": true
+  }
+}
