@@ -44,3 +44,4 @@ __pycache__/
 # Project-specific
 digests/
 .claude/commands/*.tmp
+.claude/settings.local.json
