@@ -63,7 +63,7 @@
 | topic > 100 chars | ERROR: "topic exceeds 100 characters" |
 | Invalid topic chars | ERROR: "topic contains invalid characters (use alphanumeric, hyphens, underscores, spaces)" |
 | hints > 10 items | ERROR: "hints exceeds 10 items" |
-| hint item > 50 chars | ERROR: "[hint] exceeds 50 characters" |
+| hint item > 50 chars | ERROR: `hint "<preview>..." exceeds 50 characters` (first 20 chars of hint shown as preview) |
 | All validation passes | Proceed to autonomous discovery |
 
 ---

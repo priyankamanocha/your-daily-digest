@@ -122,6 +122,30 @@ If valid, the output contains `{"valid": true, "topic": ..., "hints": ..., "snip
 
 ---
 
+### 3.5. Diff Lookup
+
+If `payload.no_diff == true`, set `diff_baseline = {"found": false}` and proceed to Step 4.
+
+Otherwise:
+
+1. Derive the topic slug from `payload.topic` using the same logic as `build_path.py`:
+   - Lowercase the topic
+   - Replace spaces with hyphens
+   - Strip any character that is not alphanumeric or a hyphen
+   - Truncate to 50 characters
+   - Store as `<derived_slug>`
+
+2. Run:
+   ```bash
+   python .claude/skills/daily-digest/scripts/diff_digest.py <derived_slug>
+   ```
+
+3. Parse the JSON output into `diff_baseline`.
+   - If the script exits with code 1, or the output cannot be parsed, set `diff_baseline = {"found": false}` and continue.
+   - If `diff_baseline.found == false` (no qualifying baseline), proceed normally — all items will pass through unfiltered.
+
+---
+
 ### 4. Spawn Three Discovery Agents in Parallel
 
 Start all three simultaneously — do not wait for one before launching the next.
@@ -198,7 +222,22 @@ Select final content:
 - **Actions**: 1–3 (concrete experiments derived from insights)
 - **Resources**: 3–5 (credible sources first, supplementary sources after)
 
-If any section falls below its minimum, add the quality warning.
+**Repeat filter** (applied after quality selection, before count enforcement):
+
+If `diff_baseline.found == true`, filter each section using the rules in `.claude/skills/daily-digest/resources/diffing-policy.md`:
+
+For each selected item, compute its **title token set**: lowercase the title, strip punctuation, remove stopwords listed in diffing-policy.md. Then for each item in the same section of `diff_baseline.sections`:
+- Check if the item's **`**Source**:` attribution** (case-insensitive, trimmed) matches the baseline item's source.
+- Compute Jaccard similarity: `|intersection(title_tokens_A, title_tokens_B)| / |union(title_tokens_A, title_tokens_B)|`.
+- If **both** conditions hold (source matches AND Jaccard ≥ 0.5), classify the item as a repeat and remove it from the section.
+
+After filtering, accumulate:
+- `suppressed_count` — total items removed across all four sections (integer, starts at 0)
+- `suppressed_baseline_date` — `diff_baseline.baseline_date` (used in the footer note at Step 9)
+
+If `diff_baseline.found == false`, skip the repeat filter entirely: `suppressed_count = 0`.
+
+If any section falls below its minimum after filtering, add the quality warning.
 
 **Manifest data**: As each section's content is finalised, record a `SelectionItem` (`title`, `primary_source_url`) for each selected item. Accumulate as `manifest_section_selections` with keys `key_insights`, `antipatterns`, `actions`, `resources`. Set `manifest_quality_warning = true` if the quality warning was triggered, otherwise `false`.
 
