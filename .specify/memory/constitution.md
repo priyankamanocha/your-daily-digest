@@ -19,7 +19,7 @@ Templates reviewed:
 Deferred items:      none
 -->
 
-# SignalFlow Constitution
+# your-daily-brief Constitution
 
 ## Core Principles
 

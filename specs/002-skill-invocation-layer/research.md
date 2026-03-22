@@ -13,7 +13,7 @@ This feature is an internal refactor of an existing skill. No new external techn
 
 **Decision**: In the skill Outline prose (Step 0), not in a Python script.
 
-**Rationale**: The SignalFlow constitution (Principle II) states business logic belongs in the skill Outline; scripts are thin I/O helpers. Argument parsing is an LLM-executable step: Claude reads `$ARGUMENTS`, identifies the topic (first quoted/unquoted token), extracts `--hints` values if present, and collects remaining quoted strings as snippets. No Python required.
+**Rationale**: The your-daily-brief constitution (Principle II) states business logic belongs in the skill Outline; scripts are thin I/O helpers. Argument parsing is an LLM-executable step: Claude reads `$ARGUMENTS`, identifies the topic (first quoted/unquoted token), extracts `--hints` values if present, and collects remaining quoted strings as snippets. No Python required.
 
 **Alternatives considered**:
 - New `parse_payload.py` — rejected; adds a file for logic Claude can do inline, violates Principle V

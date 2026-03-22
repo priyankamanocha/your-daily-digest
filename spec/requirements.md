@@ -1,8 +1,8 @@
-# Requirements: SignalFlow — Daily Intelligence Digest
+# Requirements: your-daily-brief — Daily Intelligence Digest
 
 ## 1. Overview
 
-**SignalFlow** generates a **daily digest of high-signal insights** about any topic specified by the user at invocation time.
+**your-daily-brief** generates a **daily digest of high-signal insights** about any topic specified by the user at invocation time.
 It transforms raw content (tweets, videos, blogs) into:
 
 * Actionable insights
@@ -41,28 +41,28 @@ The system is designed for **continuous learning and improvement**, not just sum
 
 ### 4.1 Data Sources
 
-* **YouTube** — user-specified seed channels, expanded over time with SignalFlow suggestions
-* **Twitter/X** — accounts identified and monitored autonomously by SignalFlow based on the topic
+* **YouTube** — user-specified seed channels, expanded over time with your-daily-brief suggestions
+* **Twitter/X** — accounts identified and monitored autonomously by your-daily-brief based on the topic
 * **Blogs & web** — autonomous search across the web, supplemented by user-provided URLs
 
 ### 4.2 Input Method
 
 The user invokes `/daily-digest <topic>` from within Claude Code (e.g. `/daily-digest Claude Code`). The default topic is **Claude Code**.
 
-SignalFlow handles its own research autonomously — the user does not need to supply URLs for each run. The user MAY provide additional URLs manually to supplement what SignalFlow finds. Both are processed together.
+your-daily-brief handles its own research autonomously — the user does not need to supply URLs for each run. The user MAY provide additional URLs manually to supplement what your-daily-brief finds. Both are processed together.
 
 ### 4.3 YouTube Source Management
 
 * The user provides an initial seed list of YouTube channels
-* After each run, SignalFlow MAY suggest additional channels it discovered that are relevant to the topic
+* After each run, your-daily-brief MAY suggest additional channels it discovered that are relevant to the topic
 * Suggested channels are added to the monitored list only after explicit user approval
 * The approved channel list persists across runs
 
 ### 4.4 Twitter/X Source Management
 
-* SignalFlow autonomously identifies accounts relevant to the specified topic (engineers, builders, researchers, practitioners)
-* SignalFlow monitors these accounts for high-signal content without requiring user input
-* SignalFlow MAY surface new accounts it discovers and flag them for the user's awareness
+* your-daily-brief autonomously identifies accounts relevant to the specified topic (engineers, builders, researchers, practitioners)
+* your-daily-brief monitors these accounts for high-signal content without requiring user input
+* your-daily-brief MAY surface new accounts it discovers and flag them for the user's awareness
 * The user does not need to provide or maintain a Twitter/X account list
 
 **Known constraint:** Autonomous account discovery involves ranking, graph traversal, and noise filtering — this is non-trivial. SpecKit should account for this complexity when phasing the implementation.
@@ -308,7 +308,7 @@ The system MUST NOT:
 The system MUST produce a structured digest:
 
 ```markdown
-# 🧠 SignalFlow Daily Digest — <topic>
+# 🧠 your-daily-brief Daily Digest — <topic>
 
 ## 🧠 Key Insights
 1. ...

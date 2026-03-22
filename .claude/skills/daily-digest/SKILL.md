@@ -3,6 +3,18 @@ name: daily-digest
 description: Generate a Daily Intelligence Digest by autonomously discovering, scoring, and synthesising insights on any topic from web, video, and social sources.
 ---
 
+TRIGGER when the user:
+- Says "research <topic>", "deep dive <topic>", or "investigate <topic>"
+- Says "what's new in X", "what's happening with X", or "latest on X"
+- Asks for a "briefing", "roundup", "digest", or "summary" on a topic
+- Says "catch me up on X" or "summarize latest X"
+- Explicitly invokes "daily digest" or "generate digest"
+
+DO NOT TRIGGER when:
+- The user asks about a specific file, codebase, or local code (use Explore agent instead)
+- The user asks a factual question answerable from training data without web search
+- The user wants to summarize a specific document or snippet they have already provided
+
 ## User Input
 
 ```text

@@ -1,4 +1,4 @@
-﻿# signalflow Development Guidelines
+﻿# your-daily-brief Development Guidelines
 
 Last updated: 2026-03-21
 
