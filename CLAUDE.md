@@ -41,11 +41,12 @@ specs/
   └── daily-digest/        # Specification, contracts, benchmark
 ```
 
-## Skill
+## Skills & Tools
 
-| Skill | Location | Description |
+| Skill / Tool | Location | Description |
 |-------|----------|-------------|
 | `daily-digest` | `.claude/skills/daily-digest/SKILL.md` | Autonomous discovery via parallel agents. Snippets accepted for testing only. |
+| `watchlist` | `.claude/skills/watchlist/watchlist.md` | Manage a personal topic watchlist and batch-refresh all saved topics with one command. |
 
 ## Implementation Style
 
