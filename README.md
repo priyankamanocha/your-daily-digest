@@ -1,25 +1,36 @@
 # your-daily-brief
 
-A Claude Code skill that autonomously generates high-signal daily intelligence digests on any topic. Discovers content across web, YouTube, and Twitter/X, then synthesises non-obvious insights, anti-patterns, and actionable experiments — saving the output as a date-stamped markdown file.
+A Claude Code skill that autonomously discovers and synthesises high-quality intelligence digests on any topic. Parallel agents search the web, video, and social sources — then score, deduplicate, and assemble insights, anti-patterns, actions, and resources that meet a strict quality rubric.
 
 ## Usage
 
 ```
 /daily-digest <topic>
+/daily-digest <topic> --hints <channel1,@handle2>
+/daily-digest <topic> "snippet 1" "snippet 2"   # test mode — no MCP tools required
 ```
 
-Default topic: **Claude Code**
+**Examples**:
+```
+/daily-digest claude-code
+/daily-digest ai-agents --hints 3blue1brown,@karpathy
+/daily-digest "prompt engineering" "Structured outputs reduce hallucination by 40%..."
+```
 
-Runs autonomous discovery via parallel subagents. Optionally supply URLs to supplement what the skill finds on its own.
+Output is written to `digests/{YYYY}/{MM}/digest-{YYYY-MM-DD}-{topic}.md`.
 
-## Output
+## Output Format
 
-Each run produces a digest at `digests/{YYYY}/{MM}/{date}-{topic}.md` containing:
+Each digest contains:
 
-- **Key Insights** — non-obvious patterns observed across advanced practitioners (1–3)
-- **Anti-patterns** — incorrect or inefficient practices to avoid (2–4)
-- **Actions to Try** — concrete experiments completable in 30 min–3 hours (1–3)
-- **Top Resources** — highest-signal sources with rationale (3–5)
+| Section | Count | Rules |
+|---------|-------|-------|
+| Key Insights | 1–3 | Each must include a direct quote as evidence |
+| Anti-patterns | 2–4 | Practices to avoid, evidenced from credible sources |
+| Actions to Try | 1–3 | Concrete experiments derived from insights |
+| Resources | 3–5 | Credible sources first |
+
+If any section falls below its minimum, a `⚠️ Low-signal content` warning is appended. Padding is never used.
 
 ## Requirements
 
@@ -28,38 +39,49 @@ Each run produces a digest at `digests/{YYYY}/{MM}/{date}-{topic}.md` containing
 | Python | ≥ 3.8, stdlib only |
 | `web_search` MCP | Must be active in Claude Code session |
 | `fetch` MCP | Must be active in Claude Code session |
-| `digests/` directory | Must be writable |
-
-## Project Structure
-
-```
-.claude/skills/daily-digest/
-  ├── daily-digest.md          # Orchestrator skill
-  ├── agents/                  # Parallel discovery subagents
-  │   ├── web-discovery-agent.md
-  │   ├── video-discovery-agent.md
-  │   └── social-discovery-agent.md
-  ├── scripts/                 # Python I/O utilities
-  │   ├── check_runtime.py
-  │   ├── validate_input.py
-  │   ├── build_path.py
-  │   └── write_digest.py
-  └── resources/               # Rubrics, policies, templates
-      ├── credibility-rules.md
-      ├── freshness-policy.md
-      ├── quality-rubric.md
-      └── digest-template.md
-
-digests/{YYYY}/{MM}/           # Generated digest output
-specs/daily-digest/            # Specification and benchmark artifacts
-```
-
-## Quality Bar
-
-Content is scored on novelty, evidence, specificity, and actionability. Items must score ≥ 2 on at least 3 dimensions to be included. All insights require a direct quote as evidence. Low-signal days surface the best available content with a visible warning rather than padding with weak material.
+| `digests/` | Must be writable (created automatically) |
 
 ## Validation
 
 ```
 /validate-digest
 ```
+
+Runs the skill against benchmark inputs and checks the output against the format contract and quality rubric. Produces a structured report at `specs/daily-digest/automated-validation-report.md`.
+
+## Project Structure
+
+```text
+.claude/
+└── skills/
+    └── daily-digest/
+        ├── daily-digest.md          # Orchestrator skill
+        ├── agents/                  # Parallel discovery agents
+        │   ├── web-discovery-agent.md
+        │   ├── video-discovery-agent.md
+        │   └── social-discovery-agent.md
+        ├── scripts/                 # Python I/O utilities (stdlib only)
+        │   ├── check_runtime.py
+        │   ├── validate_input.py
+        │   ├── build_path.py
+        │   └── write_digest.py
+        └── resources/               # Rubrics, policies, templates
+            ├── credibility-rules.md
+            ├── freshness-policy.md
+            ├── quality-rubric.md
+            └── digest-template.md
+
+digests/                             # Generated output (gitignored)
+└── {YYYY}/{MM}/
+
+specs/                               # Feature specifications and plans
+```
+
+## Development
+
+No build step. Edit a skill file, save, invoke — changes take effect immediately.
+
+- **Edit skill**: modify `.claude/skills/daily-digest/daily-digest.md` or files in `resources/`
+- **Test (autonomous)**: `/daily-digest <topic>` — requires MCP tools
+- **Test (manual)**: `/daily-digest <topic> "snippet1" "snippet2"` — no MCP tools needed
+- **Validate**: `/validate-digest`

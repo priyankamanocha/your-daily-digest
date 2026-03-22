@@ -26,14 +26,14 @@ If hint handles were provided, search those accounts first (e.g. `from:@handle {
 
 ### 2. Search X/Twitter
 
-Run each query with `web_search`. Collect the top results (up to 10 posts or threads total). Prioritise:
+Run each query with `WebSearch`. Collect the top results (up to 10 posts or threads total). Prioritise:
 1. Verified accounts
 2. Accounts with established followings in the relevant field
 3. Posts with visible engagement signals (replies, reposts)
 
 ### 3. Fetch and Extract
 
-For each post or thread URL, use `fetch` to retrieve the content. Extract:
+For each post or thread URL, use `WebFetch` to retrieve the content. Extract:
 - **title** — first sentence or main claim of the post
 - **url** — direct link to the post or thread
 - **handle** — @username of the author

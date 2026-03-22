@@ -5,7 +5,7 @@ Last updated: 2026-03-21
 ## Technologies
 
 - **Runtime**: Claude Code Skill
-- **Discovery**: Parallel subagents via MCP tools (`web_search`, `fetch`)
+- **Discovery**: Parallel subagents via Claude Code built-in tools (`WebSearch`, `WebFetch`)
 - **Processing**: Claude's native reasoning
 - **Output**: Markdown files (date-stamped, `digests/{YYYY}/{MM}/`)
 - **Storage**: File system only (local files)
@@ -69,8 +69,8 @@ specs/
 | Dependency | Requirement |
 |---|---|
 | Python | ≥ 3.8, stdlib only |
-| `web_search` MCP | Must be active in Claude Code session |
-| `fetch` MCP | Must be active in Claude Code session |
+| `WebSearch` | Built into Claude Code — no MCP needed |
+| `WebFetch` | Built into Claude Code — no MCP needed |
 | `digests/` | Must be writable |
 
 <!-- MANUAL ADDITIONS START -->
