@@ -1,4 +1,4 @@
-﻿# your-daily-brief Development Guidelines
+﻿# your-daily-digest Development Guidelines
 
 Last updated: 2026-03-21
 
