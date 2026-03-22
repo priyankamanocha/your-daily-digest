@@ -241,7 +241,7 @@ Apply scoring rules from `.claude/skills/daily-digest/resources/credibility-rule
 
 From credible sources only (score ≥ 2), extract 10–20 candidates. For each:
 
-- **Title**: 5–10 words
+- **Title**: 5–20 words
 - **Description**: 2–3 sentences (what / why / how)
 - **Evidence**: a direct quote from the source
 - **Source**: URL + publication name

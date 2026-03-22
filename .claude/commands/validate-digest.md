@@ -116,11 +116,11 @@ For each run:
 ### Step 6: Validate Titles
 
 **PASS Criteria** (automated check):
-- Insight titles: Count words in each title, verify all ≤ 10 words
+- Insight titles: Count words in each title, verify all ≤ 20 words
 - Format: Title is within `### [title]` markers
 
 **FAIL Criteria**:
-- Any insight title > 10 words
+- Any insight title > 20 words
 - Title format incorrect
 
 ### Step 7: Validate Against Benchmark Expectations
@@ -205,7 +205,7 @@ Generate `specs/daily-digest/automated-validation-report.md`:
 | Insight Evidence | PASS/FAIL | All insights have quoted evidence |
 | Anti-pattern Evidence | PASS/FAIL | All anti-patterns have full-sentence quotes |
 | Resource Grounding | PASS/FAIL | All resource titles are direct quotes from content |
-| Insight Titles | PASS/FAIL | All insight titles ≤ 10 words |
+| Insight Titles | PASS/FAIL | All insight titles ≤ 20 words |
 | Benchmark Expectations | PASS/FAIL | Key insights/anti-patterns/resources match benchmark |
 | Quality Warning | PASS/FAIL | Not present (high-signal) |
 
@@ -237,7 +237,7 @@ Generate `specs/daily-digest/automated-validation-report.md`:
 | Insight Evidence | PASS/FAIL | All insights have quoted evidence |
 | Anti-pattern Evidence | PASS/FAIL | All anti-patterns have full-sentence quotes |
 | Resource Grounding | PASS/FAIL | All resource titles are direct quotes from content |
-| Insight Titles | PASS/FAIL | All insight titles ≤ 10 words |
+| Insight Titles | PASS/FAIL | All insight titles ≤ 20 words |
 | Benchmark Expectations | PASS/FAIL | Key insights/anti-patterns/resources match benchmark |
 | Quality Warning | PASS/FAIL | Not present (high-signal) |
 

@@ -78,7 +78,7 @@ Recorded in Step 7–8 for each deduplicated candidate, including those that fai
 
 ```json
 {
-  "title": "Candidate insight title (5-10 words)",
+  "title": "Candidate insight title (5-20 words)",
   "primary_source_url": "https://highest-credibility-source.com",
   "credibility_score": 3,
   "freshness_score": 2,

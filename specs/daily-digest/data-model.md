@@ -46,7 +46,7 @@ Raw content discovered by individual agent
 Proposed insight extracted from discovered source(s)
 
 **Fields**:
-- `title` (string): Insight title (5-10 words)
+- `title` (string): Insight title (5-20 words)
 - `description` (string): What/why/how (2-3 sentences)
 - `evidence` (string): Direct quote from source
 - `source_urls` (list[string]): URLs supporting this insight
