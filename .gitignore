@@ -45,3 +45,4 @@ __pycache__/
 digests/
 .claude/commands/*.tmp
 .claude/settings.local.json
+.watchlist.json
